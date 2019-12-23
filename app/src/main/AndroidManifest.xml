@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.videocomm">
+    <!-- 联网权限-->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!--照相机权限-->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!--音频权限-->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!--android:required属性表示这项feature是否是必须的，它的值只能是true或者false。
+    如果设置为true表示这项feature是必须的，如果没有，应用将无法工作。
+    如果设置为false，表示应用需要这项feature，但如果没有，可能会影响部分功能，但应用还是能够正常工作的。
+    如果没有指定这项属性，则默认为true，即表示此feature是必须的。
+    -->
+    <uses-feature android:name="android.hardware.Camera" android:required="true"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="true"/>
+
+    <application
+        android:name=".MyApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity android:name=".LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".VideoActivity" android:launchMode="singleTop"/>
+        <activity android:name=".SettingActivity" android:launchMode="singleTop"/>
+    </application>
+
+</manifest>

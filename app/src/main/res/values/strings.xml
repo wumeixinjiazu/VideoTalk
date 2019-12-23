@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">VideoTalk</string>
+    <string name="join_jn">加入</string>
+    <string name="app_version">V1.0.123</string>
+    <string name="join_in_rule">若房间号不存在,你将创建房间并加入;若房间号存在，你将加入该房间直接通讯</string>
+    <string name="login_setting">设置</string>
+    <string name="save_setting">保存设置</string>
+    <string name="tip_appid_not_null">APP ID不能为空</string>
+    <string name="tip_server_address_not_null">服务器地址不能为空</string>
+    <string name="tip_server_port_not_null">端口不能为空</string>
+    <string name="hd_setting_custom">自定义画质</string>
+    <string name="hd_setting">画质设置</string>
+    <string name="hd_resolution">分辨率</string>
+    <string name="hd_frame">帧率</string>
+    <string name="hd_rate">码率</string>
+    <string name="cancel">取消</string>
+    <string name="default_appid">1234-abe1-13dd-e33a-1234-2387</string>
+    <string name="default_server_addr">www.iwebrtc.vip</string>
+    <string name="default_server_port">8080</string>
+    <string name="port">端口:</string>
+    <string name="server_addr">服务器地址：</string>
+    <string name="app_id">APP ID：</string>
+    <string name="sdk_version">SDK 版本：</string>
+    <string name="default_sdk_version">VComm Web SDK v1.0.1</string>
+    <string name="empty_user">用户名为空</string>
+    <string name="empty_room">房间名为空</string>
+</resources>
