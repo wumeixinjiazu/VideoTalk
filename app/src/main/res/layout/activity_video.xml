@@ -9,18 +9,9 @@
     tools:context=".VideoActivity">
 
     <SurfaceView
-        android:id="@+id/surface_remote"
+        android:id="@+id/surface_local"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <SurfaceView
-        android:id="@+id/surface_local"
-        android:background="@mipmap/ic_launcher"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="100dp"
-        android:layout_width="200dp"
-        android:layout_height="300dp" />
 
     <LinearLayout
         android:id="@+id/ll_control"
