@@ -1,6 +1,7 @@
 package com.videocomm;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -54,6 +55,8 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
     private String tag = this.getClass().getSimpleName();
     public static int mUserSelfId; //自己的用户id
     private List<UserBean> mUserBeanList = new ArrayList<>();
+    private ProgressDialog mDialog;
+
 
 
     @Override
@@ -107,6 +110,8 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
             case R.id.btn_join_in://加入
                 SpUtil.saveUserName(etUser.getText().toString());
                 SpUtil.saveRoom(etRoom.getText().toString());
+                //开启dialog
+                showDialog();
                 //请求权限
                 requestPermission();
                 checkText();
@@ -115,6 +120,18 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
             default:
                 break;
         }
+}
+
+    private void showDialog() {
+        if (mDialog == null){
+            mDialog = new ProgressDialog(this);
+            mDialog.setMessage("登录中，请等待");
+            mDialog.setCancelable(false);
+            mDialog.show();
+        }else {
+            mDialog.show();
+        }
+
     }
 
     private void startLoginSDK() {
@@ -209,7 +226,10 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
         Log.i(tag, "房间在线用户消息 dwUserNum表示在线用户数（包含自己）:" + dwUserNum + "-dwRoomId表示房间ID:" + dwRoomId);
 
         updateUserList();
-
+        //关闭Dialog
+        if (mDialog != null){
+            mDialog.dismiss();
+        }
         //打开视频通讯
         startVideoActvity();
     }
@@ -284,7 +304,6 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        anyChatSDK.Logout();
         anyChatSDK.removeEvent(this);
         anyChatSDK.Release();
     }

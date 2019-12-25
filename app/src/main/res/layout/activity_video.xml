@@ -42,6 +42,13 @@
             android:layout_height="50dp"
             android:layout_marginStart="20dp"
             android:background="@mipmap/ic_camera_reset" />
+
+        <ImageButton
+            android:id="@+id/ib_record"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/ic_record_default" />
     </LinearLayout>
 
     <HorizontalScrollView
@@ -52,11 +59,38 @@
         app:layout_constraintBottom_toTopOf="@id/ll_control"
         app:layout_constraintStart_toStartOf="parent">
 
-       <LinearLayout
-           android:id="@+id/ll_video_control"
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:orientation="horizontal"/>
+        <LinearLayout
+            android:id="@+id/ll_video_control"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" />
     </HorizontalScrollView>
+
+    <!--录像时的图标-->
+    <ImageView
+        android:id="@+id/iv_record_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/ic_recording_start"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--录像时的计时器-->
+    <Chronometer
+        android:id="@+id/chronometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:format="%s"
+        android:textColor="#ec5e58"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/iv_record_state"
+        app:layout_constraintStart_toEndOf="@id/iv_record_state"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,24 +3,27 @@ package com.videocomm;
 import android.app.ProgressDialog;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.HorizontalScrollView;
+import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.bairuitech.anychat.AnyChatBaseEvent;
 import com.bairuitech.anychat.AnyChatCoreSDK;
 import com.bairuitech.anychat.AnyChatDefine;
-import com.google.android.flexbox.FlexboxLayout;
 import com.videocomm.dlgFragment.HdSettingFragment;
 import com.videocomm.utils.DisplayUtil;
 import com.videocomm.utils.ToastUtil;
-
-import java.util.ArrayList;
 
 /**
  * @author[Wengcj]
@@ -53,16 +56,40 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
 
     private boolean bSelfVideoOpened = false; // 本地视频是否已打开
 
-    private ProgressDialog dialog;
+    private ProgressDialog mDialog;
 
     private int curCallView = 0; //记录当前通话视频的view个数
+
+    private ImageButton ibRecord;
+
+    private ImageView ivRecordState;
+
+    private boolean isRecordingState = false;//记录是否正在录制 默认关闭
+
+    private boolean isRecordState = false;//记录是否开启录制 默认关闭
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            if (isRecordingState) {
+                ivRecordState.setBackgroundResource(R.drawable.ic_recording_stop);//切换图片
+                isRecordingState = false;
+            } else {
+                ivRecordState.setBackgroundResource(R.drawable.ic_recording_start);//切换图片
+                isRecordingState = true;
+            }
+
+            mHandler.sendEmptyMessageDelayed(0, 1000);//继续一秒发送一条空消息，实现切换
+
+        }
+    };
+    private Chronometer chronometer;//计时器
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
-        Log.i(tag, "oncreate");
         initSdk();
         initView();
         initAudioVideo();
@@ -80,9 +107,9 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
             curCallView = mOnlineUser.length;
             createFlexView(mOnlineUser.length);
         } else {
-            dialog = new ProgressDialog(this);
-            dialog.setMessage("等待其他用户加入");
-            dialog.show();
+            mDialog = new ProgressDialog(this);
+            mDialog.setMessage("等待其他用户加入");
+            mDialog.show();
         }
     }
 
@@ -145,11 +172,16 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         ImageButton ibCameraReset = findViewById(R.id.ib_camera_reset);
         ImageButton ibHangUp = findViewById(R.id.ib_hang_up);
         ImageButton ibHdSetting = findViewById(R.id.ib_hd_setting);
+        ibRecord = findViewById(R.id.ib_record);
         llVideoControl = findViewById(R.id.ll_video_control);
+        ivRecordState = findViewById(R.id.iv_record_state);
+        chronometer = findViewById(R.id.chronometer);
 
         ibCameraReset.setOnClickListener(this);
         ibHangUp.setOnClickListener(this);
         ibHdSetting.setOnClickListener(this);
+        ibRecord.setOnClickListener(this);
+
 
     }
 
@@ -213,36 +245,43 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
                     }
                 }
                 break;
+            case R.id.ib_record:
+                if (!isRecordState) {
+                    startRecord();//开始录像
+                } else {
+                    stopRecord();//停止录像
+                }
+
+                break;
             default:
                 break;
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.i(tag, "onStart");
-
+    private void stopRecord() {
+        if (isRecordState) {
+            ibRecord.setBackgroundResource(R.drawable.ic_record_default);//切换成暂停录制
+            isRecordState = false;//关闭录制
+            isRecordingState = false;//关闭正在录制
+        }
+        chronometer.stop();//计时器停止
+        chronometer.setVisibility(View.GONE);//录制计时器隐藏
+        ivRecordState.setVisibility(View.GONE);//正在录制图标隐藏
+        mHandler.removeCallbacksAndMessages(null);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i(tag, "onResume");
+    private void startRecord() {
+        if (!isRecordState) {
+            ibRecord.setBackgroundResource(R.drawable.ic_record_pressed);//切换成开始录制
+            isRecordState = true;//开始录制
+            isRecordingState = true;//开始正在录制
+        }
+        chronometer.setBase(SystemClock.elapsedRealtime());//计时器清零
+        chronometer.start();//开始计时
+        chronometer.setVisibility(View.VISIBLE);//录制计时器显示
+        ivRecordState.setVisibility(View.VISIBLE);//正在录制图标显示
+        mHandler.sendEmptyMessageDelayed(0, 1000);//一秒后发送一个空消息
 
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.i(tag, "onPause");
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.i(tag, "onStop");
     }
 
     @Override
@@ -255,6 +294,8 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         anyChatSDK.UserCameraControl(-1, 0);// -1表示对本地视频进行控制，打开本地视频
         anyChatSDK.UserSpeakControl(-1, 0);// -1表示对本地音频进行控制，打开本地音频
         anyChatSDK.mSensorHelper.DestroySensor();
+        mHandler.removeCallbacksAndMessages(null);
+        mHandler = null;//防止内存泄露
     }
 
     /**
@@ -325,8 +366,8 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         if (bEnter) {
             //进入房间
             mOnlineUser = anyChatSDK.GetOnlineUser();
-            if (dialog != null && dialog.isShowing()) {
-                dialog.dismiss();
+            if (mDialog != null && mDialog.isShowing()) {
+                mDialog.dismiss();
             }
 
             Log.i(tag, "进来一个用户 ID为" + dwUserId);
@@ -343,7 +384,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
             Log.i(tag, "退出一个用户 用户名为" + anyChatSDK.GetUserName(dwUserId));
             anyChatSDK.UserCameraControl(dwUserId, 0);
             anyChatSDK.UserSpeakControl(dwUserId, 0);
-            curCallView --;//减少一个正在通话的View
+            curCallView--;//减少一个正在通话的View
             if (dwUserId != LoginActivity.mUserSelfId) { //第一次进来会走到这个方法，需要做个判断，防止空指针
                 for (int i = 0; i < mOnlineUser.length; i++) {
                     if (dwUserId == mOnlineUser[i]) {
@@ -362,8 +403,6 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
      */
     @Override
     public void OnAnyChatLinkCloseMessage(int dwErrorCode) {
-        anyChatSDK.LeaveRoom(-1);
-        anyChatSDK.Logout();
     }
 }
 

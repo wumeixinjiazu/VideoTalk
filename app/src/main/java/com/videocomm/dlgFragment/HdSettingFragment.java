@@ -20,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.bairuitech.anychat.AnyChatCoreSDK;
+import com.bairuitech.anychat.AnyChatDefine;
 import com.videocomm.R;
 import com.videocomm.adapter.HdSettingAdapter;
 import com.videocomm.utils.SpUtil;
@@ -33,6 +35,8 @@ import com.videocomm.utils.SpUtil;
 public class HdSettingFragment extends DialogFragment implements View.OnClickListener {
 
     private String[] hdSettingList = new String[]{"超清 1080P", "高清 720P", "标准 480P", "流畅 320P", "自定义画质"};
+    private int[] hdSettingWidth = {176,320,352,640, 720, 1280};
+    private int[] hdSettingHeight = {144,240,288,480, 480, 720};
     private String[] resolutionList = new String[]{"320 x 240", "352 x 288", "640 x 480", "720 x 480", "1280 x 720", "1920 x 1280"};
     private String[] frameList = new String[]{"5 f/s", "10 f/s", "15 f/s", "20 f/s", "25 f/s", "30 f"};
     private String[] rateList = new String[]{"100 kb/s", "150 kb/s", "200 kb/s", "300 kb/s", "500 kb/s", "800 kb/s", "1 Mb/s", "1.2 Mb/s", "1.5 Mb/s", "2 Mb/s"};
@@ -107,12 +111,39 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
                 adapter.setChooseNumber(position);
                 adapter.notifyDataSetChanged();
                 if (position == adapter.getCount() - 1) {
+                    //最后一个
                     lvHdList.setVisibility(View.GONE);
                     line.setVisibility(View.GONE);
                     tvTitleLeft.setText(getString(R.string.hd_setting_custom));
                     tvTitleLeft.setClickable(true);
                     llCustom.setVisibility(View.VISIBLE);
+                } else {
+                    //anychat可以设置六个分辨率 我们只有四个
+                    // 设置本地视频采集分辨率
+                    AnyChatCoreSDK.SetSDKOptionInt(
+                            AnyChatDefine.BRAC_SO_LOCALVIDEO_WIDTHCTRL, hdSettingWidth[position]);
+
+                    AnyChatCoreSDK.SetSDKOptionInt(
+                            AnyChatDefine.BRAC_SO_LOCALVIDEO_HEIGHTCTRL,
+                            hdSettingHeight[position]);
+
+                    // 设置本地视频编码的帧率
+                    AnyChatCoreSDK.SetSDKOptionInt(
+                            AnyChatDefine.BRAC_SO_LOCALVIDEO_FPSCTRL,
+                            150*1000);
+
+                    // 设置本地视频编码的码率（如果码率为0，则表示使用质量优先模式）
+                    AnyChatCoreSDK.SetSDKOptionInt(
+                            AnyChatDefine.BRAC_SO_LOCALVIDEO_BITRATECTRL,
+                            10);
+
+                    // 让视频参数生效
+                    AnyChatCoreSDK.SetSDKOptionInt(
+                            AnyChatDefine.BRAC_SO_LOCALVIDEO_APPLYPARAM,
+                            1);
                 }
+
+
             }
         });
 
