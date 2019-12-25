@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
+import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -68,6 +70,9 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
 
     private boolean isRecordState = false;//记录是否开启录制 默认关闭
 
+    SparseIntArray userList = new SparseIntArray();//存储用户的列表 用户退出时可以判断是哪个View
+
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -100,9 +105,12 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     private void initCallView() {
         //其他用户的userid
         mOnlineUser = anyChatSDK.GetOnlineUser();
+        userList.clear();
+
         if (mOnlineUser.length > 0) {
             for (int i = 0; i < mOnlineUser.length; i++) {
-                Log.i(tag, "接收LoginActivity传过来的Userid" + mOnlineUser[i]);
+                Log.i(tag, "接收传过来的Userid" + mOnlineUser[i]);
+                userList.put(mOnlineUser[i], mOnlineUser[i]);//把用户的id存进数组
             }
             curCallView = mOnlineUser.length;
             createFlexView(mOnlineUser.length);
@@ -160,6 +168,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         anyChatSDK = AnyChatCoreSDK.getInstance(VideoActivity.this);
         anyChatSDK.SetBaseEvent(this);
         anyChatSDK.mSensorHelper.InitSensor(getApplicationContext());
+        anyChatSDK.CameraAutoFocus();//自动对焦
         AnyChatCoreSDK.mCameraHelper.SetContext(getApplicationContext());
     }
 
@@ -189,8 +198,8 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
      * @param numView 需要创建多少个view
      */
     private void createFlexView(int numView) {
-        int width = DisplayUtil.getScreenWidth() / 4;
-        int heigth = DisplayUtil.getScreenHeight() / 6;
+        int width = DisplayUtil.getScreenWidth() / 3;
+        int heigth = DisplayUtil.getScreenHeight() / 4;
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, heigth);
         lp.rightMargin = DisplayUtil.dp2px(10);
         for (int i = 0; i < numView; i++) {
@@ -365,7 +374,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         Log.i(tag, "用户进入/退出房间消息，dwUserId表示用户ID号，bEnter表示该用户是进入（TRUE）或离开（FALSE）房间:" + dwUserId + "-bEnter:" + bEnter);
         if (bEnter) {
             //进入房间
-            mOnlineUser = anyChatSDK.GetOnlineUser();
+            mOnlineUser = anyChatSDK.GetOnlineUser();//获取在线的人数 不包括自己
             if (mDialog != null && mDialog.isShowing()) {
                 mDialog.dismiss();
             }
@@ -373,10 +382,13 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
             Log.i(tag, "进来一个用户 ID为" + dwUserId);
             Log.i(tag, "进来一个用户 用户名为" + anyChatSDK.GetUserName(dwUserId));
             if (curCallView == 0) {
-                curCallView = mOnlineUser.length;
+                curCallView = mOnlineUser.length;//length 从 1 开始
+                userList.put(dwUserId, dwUserId);//把用户的id存进数组
                 createFlexView(mOnlineUser.length);
             } else {
+                userList.put(dwUserId, dwUserId);//把用户的id存进数组
                 createFlexView(mOnlineUser.length - curCallView);
+                curCallView = mOnlineUser.length;//刷新当前其他用户界面
             }
         } else {
             //退出房间
@@ -386,11 +398,12 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
             anyChatSDK.UserSpeakControl(dwUserId, 0);
             curCallView--;//减少一个正在通话的View
             if (dwUserId != LoginActivity.mUserSelfId) { //第一次进来会走到这个方法，需要做个判断，防止空指针
-                for (int i = 0; i < mOnlineUser.length; i++) {
-                    if (dwUserId == mOnlineUser[i]) {
-                        llVideoControl.removeViewAt(i);
-                    }
-                }
+                Log.i(tag, "退出一个用户 ID索引" + userList.indexOfValue(dwUserId));
+                Log.i(tag, "llVideoControl childCount" + llVideoControl.getChildCount());
+                View removeView = llVideoControl.getChildAt(userList.indexOfValue(dwUserId));
+                llVideoControl.removeView(removeView);
+                userList.removeAt(userList.indexOfValue(dwUserId));//移除
+
             }
             ToastUtil.show("用户" + dwUserId + "离开房间");
         }
