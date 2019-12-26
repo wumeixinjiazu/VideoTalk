@@ -37,8 +37,14 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class LoginActivity extends AbsActivity implements View.OnClickListener, AnyChatBaseEvent {
 
-    private EditText etUser;//用户名
-    private EditText etRoom;//房间号
+    /**
+     * 用户名
+     */
+    private EditText etUser;
+    /**
+     * 房间号
+     */
+    private EditText etRoom;
     private TextView tvAppVersion;
     private Button btnJoinIn;
 
@@ -47,16 +53,11 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
 
     public AnyChatCoreSDK anyChatSDK;
 
-    private final int SHOWLOGINSTATEFLAG = 1; // 显示的按钮是登陆状态的标识
-    private final int SHOWWAITINGSTATEFLAG = 2; // 显示的按钮是等待状态的标识
-    private final int SHOWLOGOUTSTATEFLAG = 3; // 显示的按钮是登出状态的标识
-
     private final int LOCALVIDEOAUTOROTATION = 1; // 本地视频自动旋转控制
     private String tag = this.getClass().getSimpleName();
     public static int mUserSelfId; //自己的用户id
     private List<UserBean> mUserBeanList = new ArrayList<>();
     private ProgressDialog mDialog;
-
 
 
     @Override
@@ -120,15 +121,15 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
             default:
                 break;
         }
-}
+    }
 
     private void showDialog() {
-        if (mDialog == null){
+        if (mDialog == null) {
             mDialog = new ProgressDialog(this);
             mDialog.setMessage("登录中，请等待");
             mDialog.setCancelable(false);
             mDialog.show();
-        }else {
+        } else {
             mDialog.show();
         }
 
@@ -227,7 +228,7 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
 
         updateUserList();
         //关闭Dialog
-        if (mDialog != null){
+        if (mDialog != null) {
             mDialog.dismiss();
         }
         //打开视频通讯
