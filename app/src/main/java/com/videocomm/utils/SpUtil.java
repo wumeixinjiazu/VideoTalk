@@ -26,91 +26,103 @@ public class SpUtil {
     private static SharedPreferences.Editor mEdit;
     private static SharedPreferences sp;
 
-    static {
-        sp = AppUtil.getApp().getSharedPreferences(SPFILENAME, Context.MODE_PRIVATE);
-        mEdit = sp.edit();
+    private static SpUtil mSpUtil;
+
+    private SpUtil() {
+        //不允许创建实例
+    }
+
+    public static SpUtil getInstance() {
+        if (mSpUtil == null || sp == null || mEdit == null) {
+            mSpUtil = new SpUtil();
+
+            sp = AppUtil.getApp().getSharedPreferences(SPFILENAME, Context.MODE_PRIVATE);
+            mEdit = sp.edit();
+            return mSpUtil;
+        }
+        return mSpUtil;
     }
 
     //保存
-    public static void saveUserName(String userName) {
+    public void saveUserName(String userName) {
         mEdit.putString(USERNAME, userName);
         mEdit.apply();
     }
 
-    public static void saveRoom(String room) {
+    public void saveRoom(String room) {
         mEdit.putString(ROOM, room);
         mEdit.apply();
     }
 
-    public static void saveAppId(String appId) {
+    public void saveAppId(String appId) {
         mEdit.putString(APPID, appId);
         mEdit.apply();
     }
 
-    public static void saveServerAddr(String serverAddr) {
+    public void saveServerAddr(String serverAddr) {
         mEdit.putString(SERVERADDR, serverAddr);
         mEdit.apply();
     }
 
-    public static void saveServerPort(String serverPort) {
+    public void saveServerPort(String serverPort) {
         mEdit.putString(SERVERPORT, serverPort);
         mEdit.apply();
     }
 
-    public static void saveHdSettingItem(int num) {
+    public void saveHdSettingItem(int num) {
         mEdit.putInt(HDSETTINGITEM, num);
         mEdit.apply();
     }
 
-    public static void saveHdCustomResolution(int resolution) {
+    public void saveHdCustomResolution(int resolution) {
         mEdit.putInt(HDCUSTOMRESOLUTION, resolution);
         mEdit.apply();
     }
 
-    public static void saveHdCustomFrame(int frame) {
+    public void saveHdCustomFrame(int frame) {
         mEdit.putInt(HDCUSTOMFRAME, frame);
         mEdit.apply();
     }
 
-    public static void saveHdCustomRate(int rate) {
+    public void saveHdCustomRate(int rate) {
         mEdit.putInt(HDCUSTOMRATE, rate);
         mEdit.apply();
     }
 
     //获取
-    public static String getUsername() {
+    public String getUsername() {
         return sp.getString(USERNAME, "");
     }
 
-    public static String getRoom() {
+    public String getRoom() {
         return sp.getString(ROOM, "");
     }
 
-    public static String getAppid() {
+    public String getAppid() {
         return sp.getString(APPID, "");
     }
 
-    public static String getServerAddr() {
+    public String getServerAddr() {
         return sp.getString(SERVERADDR, "");
     }
 
-    public static String getServerPort() {
+    public String getServerPort() {
         return sp.getString(SERVERPORT, "");
     }
 
-    public static int getHdSettingItem() {
+    public int getHdSettingItem() {
         return sp.getInt(HDSETTINGITEM, 0);
     }
 
-    public static int getHdCustomResolution() {
+    public int getHdCustomResolution() {
         return sp.getInt(HDCUSTOMRESOLUTION, 0);
     }
 
-    public static int getHdCustomFrame() {
+    public int getHdCustomFrame() {
         return sp.getInt(HDCUSTOMFRAME, 0);
     }
 
-    public static int getHdCustomRate() {
+    public int getHdCustomRate() {
         return sp.getInt(HDCUSTOMRATE, 0);
     }
 

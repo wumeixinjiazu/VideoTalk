@@ -1,5 +1,6 @@
 package com.videocomm;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -27,6 +28,8 @@ import com.videocomm.dlgFragment.HdSettingFragment;
 import com.videocomm.utils.DisplayUtil;
 import com.videocomm.utils.ToastUtil;
 
+import java.lang.ref.WeakReference;
+
 /**
  * @author[Wengcj]
  * @version[创建日期，2019/12/16 0016]
@@ -52,7 +55,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     private ImageView ivRecordState;
 
     /**
-     * 存储用户的列表 用户退出时可以判断是哪个View
+     * 存储用户的列表 用于用户退出时可以判断要移除的view
      */
     SparseIntArray userList = new SparseIntArray();
 
@@ -69,28 +72,39 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     /**
      * 记录是否正在录制 默认关闭
      */
-    private boolean isRecordingState = false;
+    public boolean isRecordingState = false;
 
     /**
      * 记录是否开启录制 默认关闭
      */
     private boolean isRecordState = false;
 
-    private Handler mHandler = new Handler() {
+    private VideoHandler mHandler = new VideoHandler(this);
+
+    static class VideoHandler extends Handler {
+        WeakReference<Activity> refActivity;
+
+        public VideoHandler(Activity activity) {
+            refActivity = new WeakReference<>(activity);
+        }
+
         @Override
         public void handleMessage(@NonNull Message msg) {
-            if (isRecordingState) {
-                ivRecordState.setBackgroundResource(R.drawable.ic_recording_stop);//切换图片
-                isRecordingState = false;
-            } else {
-                ivRecordState.setBackgroundResource(R.drawable.ic_recording_start);//切换图片
-                isRecordingState = true;
+            if (refActivity.get() != null){
+                VideoActivity activity = (VideoActivity) refActivity.get();
+                if (activity.isRecordingState) {
+                    activity.ivRecordState.setBackgroundResource(R.drawable.ic_recording_stop);//切换图片
+                    activity.isRecordingState = false;
+                } else {
+                    activity.ivRecordState.setBackgroundResource(R.drawable.ic_recording_start);//切换图片
+                    activity.isRecordingState = true;
+                }
+
+                activity.mHandler.sendEmptyMessageDelayed(0, 1000);//继续一秒发送一条空消息，实现切换
             }
 
-            mHandler.sendEmptyMessageDelayed(0, 1000);//继续一秒发送一条空消息，实现切换
-
         }
-    };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -291,6 +305,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         chronometer.start();//开始计时
         chronometer.setVisibility(View.VISIBLE);//录制计时器显示
         ivRecordState.setVisibility(View.VISIBLE);//正在录制图标显示
+
         mHandler.sendEmptyMessageDelayed(0, 1000);//一秒后发送一个空消息
 
     }

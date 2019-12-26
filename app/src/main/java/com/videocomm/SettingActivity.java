@@ -1,5 +1,6 @@
 package com.videocomm;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -29,11 +30,11 @@ public class SettingActivity extends AbsActivity implements View.OnClickListener
     private String mServerAddr;
     private String mServerPort;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
-
         initTitle();//初始化标题栏
         initView();
     }
@@ -48,16 +49,16 @@ public class SettingActivity extends AbsActivity implements View.OnClickListener
 
     private void initView() {
         //获取上次保存的数据
-        mAppid = SpUtil.getAppid();
-        mServerAddr = SpUtil.getServerAddr();
-        mServerPort = SpUtil.getServerPort();
+        mAppid = SpUtil.getInstance().getAppid();
+        mServerAddr = SpUtil.getInstance().getServerAddr();
+        mServerPort = SpUtil.getInstance().getServerPort();
 
         tvSdkVersion = findViewById(R.id.tv_sdk_version);
         etAppId = findViewById(R.id.et_app_id);
         etServerAddress = findViewById(R.id.et_server_address);
         etServerPort = findViewById(R.id.et_server_port);
-        Button btnSaveSetting = findViewById(R.id.btn_save_setting);
 
+        Button btnSaveSetting = findViewById(R.id.btn_save_setting);
         btnSaveSetting.setOnClickListener(this);
 
         //初始化数值
@@ -99,9 +100,9 @@ public class SettingActivity extends AbsActivity implements View.OnClickListener
             return;
         }
 
-        SpUtil.saveAppId(appId);
-        SpUtil.saveServerAddr(serverAddress);
-        SpUtil.saveServerPort(serverPort);
+        SpUtil.getInstance().saveAppId(appId);
+        SpUtil.getInstance().saveServerAddr(serverAddress);
+        SpUtil.getInstance().saveServerPort(serverPort);
 
         ToastUtil.show("保存成功");
     }

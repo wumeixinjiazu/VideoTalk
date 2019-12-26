@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import com.bairuitech.anychat.AnyChatBaseEvent;
 import com.bairuitech.anychat.AnyChatCoreSDK;
 import com.bairuitech.anychat.AnyChatDefine;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.videocomm.bean.UserBean;
 import com.videocomm.utils.SpUtil;
 import com.videocomm.utils.ToastUtil;
@@ -84,8 +85,8 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
      */
     private void initView() {
         //获取上次保存的用户名房间号
-        mUsername = SpUtil.getUsername();
-        mRoom = SpUtil.getRoom();
+        mUsername = SpUtil.getInstance().getUsername();
+        mRoom = SpUtil.getInstance().getRoom();
 
         ImageButton ibSetting = findViewById(R.id.ib_setting);
         etUser = findViewById(R.id.et_user);
@@ -109,8 +110,8 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
                 startActivity(new Intent(LoginActivity.this, SettingActivity.class));
                 break;
             case R.id.btn_join_in://加入
-                SpUtil.saveUserName(etUser.getText().toString());
-                SpUtil.saveRoom(etRoom.getText().toString());
+                SpUtil.getInstance().saveUserName(etUser.getText().toString());
+                SpUtil.getInstance().saveRoom(etRoom.getText().toString());
                 //开启dialog
                 showDialog();
                 //请求权限

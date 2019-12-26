@@ -74,11 +74,11 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //获取上次设置的画质设置
-        hdSettingItem = SpUtil.getHdSettingItem();
+        hdSettingItem = SpUtil.getInstance().getHdSettingItem();
         //获取上次设置的自定义画质
-        mResolution = SpUtil.getHdCustomResolution();
-        mFrame = SpUtil.getHdCustomFrame();
-        mRate = SpUtil.getHdCustomRate();
+        mResolution = SpUtil.getInstance().getHdCustomResolution();
+        mFrame = SpUtil.getInstance().getHdCustomFrame();
+        mRate = SpUtil.getInstance().getHdCustomRate();
 
     }
 
@@ -125,7 +125,7 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
                 CheckedTextView curCtv = view.findViewById(R.id.ctv);
                 curCtv.setChecked(true);
                 //把当前选中的位置记录并保存下来
-                SpUtil.saveHdSettingItem(position);
+                SpUtil.getInstance().saveHdSettingItem(position);
                 adapter.setChooseNumber(position);
                 adapter.notifyDataSetChanged();
                 if (position == adapter.getCount() - 1) {
@@ -204,7 +204,7 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 //滑动结束当前状态
-                SpUtil.saveHdCustomResolution(seekBar.getProgress());
+                SpUtil.getInstance().saveHdCustomResolution(seekBar.getProgress());
             }
         });
 
@@ -222,7 +222,7 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                SpUtil.saveHdCustomFrame(seekBar.getProgress());
+                SpUtil.getInstance().saveHdCustomFrame(seekBar.getProgress());
             }
         });
 
@@ -240,7 +240,7 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                SpUtil.saveHdCustomRate(seekBar.getProgress());
+                SpUtil.getInstance().saveHdCustomRate(seekBar.getProgress());
             }
         });
     }
