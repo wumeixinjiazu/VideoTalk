@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -24,11 +25,15 @@ import androidx.annotation.NonNull;
 import com.bairuitech.anychat.AnyChatBaseEvent;
 import com.bairuitech.anychat.AnyChatCoreSDK;
 import com.bairuitech.anychat.AnyChatDefine;
+import com.bairuitech.anychat.AnyChatRecordEvent;
 import com.videocomm.dlgFragment.HdSettingFragment;
 import com.videocomm.utils.DisplayUtil;
 import com.videocomm.utils.ToastUtil;
 
 import java.lang.ref.WeakReference;
+
+import static com.bairuitech.anychat.AnyChatDefine.ANYCHAT_RECORD_FLAGS_AUDIO;
+import static com.bairuitech.anychat.AnyChatDefine.ANYCHAT_RECORD_FLAGS_VIDEO;
 
 /**
  * @author[Wengcj]
@@ -36,7 +41,7 @@ import java.lang.ref.WeakReference;
  * @function[功能简介 视频通讯的Acitivity]
  **/
 
-public class VideoActivity extends AbsActivity implements View.OnClickListener, AnyChatBaseEvent {
+public class VideoActivity extends AbsActivity implements View.OnClickListener, AnyChatBaseEvent, AnyChatRecordEvent {
 
     private static final String tagSdk = "VCommSdk";
 
@@ -90,7 +95,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
 
         @Override
         public void handleMessage(@NonNull Message msg) {
-            if (refActivity.get() != null){
+            if (refActivity.get() != null) {
                 VideoActivity activity = (VideoActivity) refActivity.get();
                 if (activity.isRecordingState) {
                     activity.ivRecordState.setBackgroundResource(R.drawable.ic_recording_stop);//切换图片
@@ -114,6 +119,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         initView();
         initAudioVideo();
         initCallView();
+
 
     }
 
@@ -189,6 +195,9 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         anyChatSDK.mSensorHelper.InitSensor(getApplicationContext());
         anyChatSDK.CameraAutoFocus();//自动对焦
         AnyChatCoreSDK.mCameraHelper.SetContext(getApplicationContext());
+        //设置录制拍照的回调
+        anyChatSDK.SetRecordSnapShotEvent(this);
+
     }
 
     /**
@@ -284,6 +293,9 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     }
 
     private void stopRecord() {
+        int flag = AnyChatDefine.ANYCHAT_RECORD_FLAGS_VIDEO + AnyChatDefine.ANYCHAT_RECORD_FLAGS_AUDIO;
+        int state = anyChatSDK.StreamRecordCtrlEx(-1, 0, flag, 12306, "");
+
         if (isRecordState) {
             ibRecord.setBackgroundResource(R.drawable.ic_record_default);//切换成暂停录制
             isRecordState = false;//关闭录制
@@ -296,6 +308,14 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     }
 
     private void startRecord() {
+
+        int flag = AnyChatDefine.ANYCHAT_RECORD_FLAGS_VIDEO + AnyChatDefine.ANYCHAT_RECORD_FLAGS_AUDIO + AnyChatDefine.ANYCHAT_RECORD_FLAGS_ABREAST + AnyChatDefine.ANYCHAT_RECORD_FLAGS_STEREO;
+        int state = anyChatSDK.StreamRecordCtrlEx(-1, 1, flag, 12306, "");
+        if (state != 0) {
+            ToastUtil.show("录制失败" + state);
+            return;
+        }
+
         if (!isRecordState) {
             ibRecord.setBackgroundResource(R.drawable.ic_record_pressed);//切换成开始录制
             isRecordState = true;//开始录制
@@ -356,11 +376,12 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     protected void onDestroy() {
         super.onDestroy();
         Log.i(tag, "onDestroy");
-        anyChatSDK.LeaveRoom(-1);
-        anyChatSDK.Logout();
-        anyChatSDK.removeEvent(this);
+        llVideoControl.removeAllViews();
         anyChatSDK.UserCameraControl(-1, 0);// -1表示对本地视频进行控制，关闭本地视频
         anyChatSDK.UserSpeakControl(-1, 0);// -1表示对本地音频进行控制，关闭本地音频
+        anyChatSDK.removeEvent(this);
+        anyChatSDK.LeaveRoom(-1);
+        anyChatSDK.Logout();
         anyChatSDK.mSensorHelper.DestroySensor();
         mHandler.removeCallbacksAndMessages(null);
         mHandler = null;//防止内存泄露
@@ -469,5 +490,45 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     public void OnAnyChatLinkCloseMessage(int dwErrorCode) {
 
     }
+
+    /**
+     * 视频录制完成事件 StreamRecordCtrlEx 录像完成之后，将会触发该回调事件
+     *
+     * @param dwUserId    被录制用户 ID
+     * @param dwErrorCode 错误代码
+     * @param lpFileName  文件保存路径
+     * @param dwElapse    录像时长，单位：秒
+     * @param dwFlags     录像标志
+     * @param dwParam     用户自定义参数，整型
+     * @param lpUserStr   用户自定义参数，字符串类型
+     */
+    @Override
+    public void OnAnyChatRecordEvent(int dwUserId, int dwErrorCode, String lpFileName, int dwElapse, int dwFlags, int dwParam, String lpUserStr) {
+        Log.i(tag, "被录制用户 ID" + dwUserId);
+        Log.i(tag, "文件保存路径" + lpFileName);
+        Log.i(tag, "录像时长，单位：秒" + dwElapse);
+        Log.i(tag, "录像标志" + dwFlags);
+        Log.i(tag, "用户自定义参数，整型" + dwParam);
+        ;
+        Log.i(tag, "用户自定义参数，字符串类型" + lpUserStr);
+        ;
+        ToastUtil.show("录制结束，文件保存在" + lpFileName);
+    }
+
+    /**
+     * 图像抓拍完成事件
+     *
+     * @param dwUserId
+     * @param dwErrorCode
+     * @param lpFileName
+     * @param dwFlags
+     * @param dwParam
+     * @param lpUserStr
+     */
+    @Override
+    public void OnAnyChatSnapShotEvent(int dwUserId, int dwErrorCode, String lpFileName, int dwFlags, int dwParam, String lpUserStr) {
+
+    }
+
 }
 

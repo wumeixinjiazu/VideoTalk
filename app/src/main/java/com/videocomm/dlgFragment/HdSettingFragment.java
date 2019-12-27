@@ -52,7 +52,7 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
     /**
      * 帧率
      */
-    private final int[] mArrVideofpsValue = {2, 4, 6, 8, 10, 15, 20, 25};
+    private final int[] mArrVideofpsValue = {10, 15, 20, 25};
 
 
     private String[] resolutionList = new String[]{"320 x 240", "352 x 288", "640 x 480", "720 x 480", "1280 x 720", "1920 x 1280"};
@@ -117,6 +117,11 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
         lvHdList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                //选择的和上次一样 直接返回
+                if (position == adapter.getChooseNumber()){
+                    return;
+                }
                 //获取上次选中的View
                 View preView = lvHdList.getChildAt(adapter.getChooseNumber());
                 CheckedTextView preCtv = preView.findViewById(R.id.ctv);
@@ -153,7 +158,7 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
                     // 设置本地视频编码的码率（如果码率为0，则表示使用质量优先模式）
                     AnyChatCoreSDK.SetSDKOptionInt(
                             AnyChatDefine.BRAC_SO_LOCALVIDEO_BITRATECTRL,
-                            800);
+                            mArrVideoBitrateValue[position]);
 
                     // 让视频参数生效
                     AnyChatCoreSDK.SetSDKOptionInt(
@@ -162,8 +167,6 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
 
                     ToastUtil.show("像素调节成功" + position);
                 }
-
-
             }
         });
 
