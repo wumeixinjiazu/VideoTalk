@@ -4,13 +4,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import com.videocomm.R;
 import com.videocomm.utils.SpUtil;
 import com.videocomm.utils.ToastUtil;
 
@@ -29,6 +30,7 @@ public class SettingActivity extends AbsActivity implements View.OnClickListener
     private String mAppid;
     private String mServerAddr;
     private String mServerPort;
+    private String[] mVideoRecordWayList = {"单人录制","多人录制"};
 
 
     @Override
@@ -57,6 +59,11 @@ public class SettingActivity extends AbsActivity implements View.OnClickListener
         etAppId = findViewById(R.id.et_app_id);
         etServerAddress = findViewById(R.id.et_server_address);
         etServerPort = findViewById(R.id.et_server_port);
+        Spinner spinnerRecordWay = findViewById(R.id.spinner_record_way);
+        ArrayAdapter<String> videoSizeAdapter;
+        videoSizeAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,mVideoRecordWayList);
+        videoSizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerRecordWay.setAdapter(videoSizeAdapter);
 
         Button btnSaveSetting = findViewById(R.id.btn_save_setting);
         btnSaveSetting.setOnClickListener(this);

@@ -30,13 +30,6 @@
             android:background="@mipmap/ic_hd_setting" />
 
         <ImageButton
-            android:id="@+id/ib_hang_up"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:background="@mipmap/ic_hang_up" />
-
-        <ImageButton
             android:id="@+id/ib_camera_reset"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -44,11 +37,26 @@
             android:background="@mipmap/ic_camera_reset" />
 
         <ImageButton
+            android:id="@+id/ib_hang_up"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="20dp"
+            android:background="@mipmap/ic_hang_up" />
+
+
+        <ImageButton
             android:id="@+id/ib_record"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginStart="20dp"
             android:background="@drawable/ic_record_default" />
+
+        <ImageButton
+            android:id="@+id/ib_more"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/ic_more" />
     </LinearLayout>
 
     <HorizontalScrollView

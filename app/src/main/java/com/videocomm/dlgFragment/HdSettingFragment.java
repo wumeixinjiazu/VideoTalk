@@ -107,8 +107,6 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
         llCustom = view.findViewById(R.id.ll_custom);//自定义画质布局
 
         tvTitleLeft.setClickable(false);
-        tvTitleLeft.setCompoundDrawables(null, null, null, null);
-
         tvTitleLeft.setOnClickListener(this);
         tvDlgClose.setOnClickListener(this);
 
@@ -118,10 +116,6 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //选择的和上次一样 直接返回
-                if (position == adapter.getChooseNumber()){
-                    return;
-                }
                 //获取上次选中的View
                 View preView = lvHdList.getChildAt(adapter.getChooseNumber());
                 CheckedTextView preCtv = preView.findViewById(R.id.ctv);
@@ -138,6 +132,7 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
                     lvHdList.setVisibility(View.GONE);
                     line.setVisibility(View.GONE);
                     tvTitleLeft.setText(getString(R.string.hd_setting_custom));
+                    tvTitleLeft.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_back, 0, 0, 0);
                     tvTitleLeft.setClickable(true);
                     llCustom.setVisibility(View.VISIBLE);
                 } else {
@@ -255,6 +250,7 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
                 lvHdList.setVisibility(View.VISIBLE);
                 line.setVisibility(View.VISIBLE);
                 tvTitleLeft.setText(getString(R.string.hd_setting));
+                tvTitleLeft.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
                 tvTitleLeft.setClickable(false);
                 llCustom.setVisibility(View.GONE);
                 break;

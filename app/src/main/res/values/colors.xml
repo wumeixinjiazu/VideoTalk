@@ -7,4 +7,5 @@
     <color name="white">#ffffff</color>
     <color name="gray">#D1D0D0</color>
     <color name="cam_blue">#04ECE4</color>
+    <color name="transparent">#00000000</color>
 </resources>

@@ -21,7 +21,7 @@
     <string name="server_addr">服务器地址：</string>
     <string name="app_id">APP ID：</string>
     <string name="sdk_version">SDK 版本：</string>
-    <string name="default_sdk_version">VComm Web SDK v1.0.1</string>
+    <string name="default_sdk_version">VComm Android SDK v1.0.1</string>
     <string name="empty_user">用户名为空</string>
     <string name="empty_room">房间名为空</string>
 </resources>
