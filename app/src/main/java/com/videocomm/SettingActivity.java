@@ -1,10 +1,8 @@
 package com.videocomm;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -30,7 +28,11 @@ public class SettingActivity extends AbsActivity implements View.OnClickListener
     private String mAppid;
     private String mServerAddr;
     private String mServerPort;
-    private String[] mVideoRecordWayList = {"单人录制","多人录制"};
+
+    private String[] mVideoRecordWayList = {"本地录制", "服务器录制"};
+    private String[] mVideoRecordTypeList = {"音视频", "音频", "视频"};
+    private String[] mVideoRecordObjectList = {"单人", "双人", "全部"};
+    private String[] mVideoRecordModeList = {"画中画模式", "并列模式", "三画面模式"};
 
 
     @Override
@@ -59,11 +61,12 @@ public class SettingActivity extends AbsActivity implements View.OnClickListener
         etAppId = findViewById(R.id.et_app_id);
         etServerAddress = findViewById(R.id.et_server_address);
         etServerPort = findViewById(R.id.et_server_port);
+
         Spinner spinnerRecordWay = findViewById(R.id.spinner_record_way);
-        ArrayAdapter<String> videoSizeAdapter;
-        videoSizeAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,mVideoRecordWayList);
-        videoSizeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerRecordWay.setAdapter(videoSizeAdapter);
+        Spinner spinnerRecordType = findViewById(R.id.spinner_record_type);
+        Spinner spinnerRecordObject = findViewById(R.id.spinner_record_object);
+        Spinner spinnerRecordMode = findViewById(R.id.spinner_record_mode);
+        Spinner spinnerRecordUser = findViewById(R.id.spinner_record_user);
 
         Button btnSaveSetting = findViewById(R.id.btn_save_setting);
         btnSaveSetting.setOnClickListener(this);
@@ -81,7 +84,7 @@ public class SettingActivity extends AbsActivity implements View.OnClickListener
                 finish();
                 break;
             case R.id.btn_save_setting://保存设置
-                checkText();
+                checkAndSaveText();
                 break;
             default:
                 break;
@@ -89,7 +92,7 @@ public class SettingActivity extends AbsActivity implements View.OnClickListener
         }
     }
 
-    private void checkText() {
+    private void checkAndSaveText() {
         String appId = etAppId.getText().toString();
         String serverAddress = etServerAddress.getText().toString();
         String serverPort = etServerPort.getText().toString();
@@ -110,6 +113,7 @@ public class SettingActivity extends AbsActivity implements View.OnClickListener
         SpUtil.getInstance().saveAppId(appId);
         SpUtil.getInstance().saveServerAddr(serverAddress);
         SpUtil.getInstance().saveServerPort(serverPort);
+
 
         ToastUtil.show("保存成功");
     }

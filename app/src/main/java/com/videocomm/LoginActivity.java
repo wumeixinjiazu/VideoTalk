@@ -150,19 +150,6 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
         }
     }
 
-    // 打开系统的文件选择器
-    public void chooseFile() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*");
-        try {
-            startActivityForResult(Intent.createChooser(intent, "选择文件"), 1234);
-        } catch (android.content.ActivityNotFoundException ex) {
-            ToastUtil.show("没有文件管理器");
-        }
-//        startActivityForResult(intent, 1234);
-    }
-
     private void showLoginDialog() {
         if (mDialog == null) {
             mDialog = new ProgressDialog(this);
@@ -273,29 +260,7 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case 1234:
-                if (data == null) {
-                    // 用户未选择任何文件，直接返回
-                    return;
-                }
-                Uri uri = data.getData();
-                // 通过ContentProvider查询文件路径
-                ContentResolver resolver = this.getContentResolver();
-                Cursor cursor = resolver.query(uri, null, null, null, null);
-                if (cursor == null) {
-                    // 未查询到，说明为普通文件，可直接通过URI获取文件路径
-                    String path = uri.getPath();
-                    Log.i(tag, "c------->" + path);
-                    return;
-                }
-                if (cursor.moveToFirst()) {
-                    // 多媒体文件，从数据库中获取文件的真实路径
-                    String path = cursor.getString(cursor.getColumnIndex("_data"));
-                    Log.i(tag, "------->" + path);
 
-                }
-                cursor.close();
-                break;
             case VIDEOACTIVITY_EXIT_CODE:
                 //VideoActivity退出后 要重新设置事件 不然收不到消息
                 anyChatSDK.removeEvent(this);

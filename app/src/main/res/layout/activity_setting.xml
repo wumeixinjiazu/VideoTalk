@@ -68,7 +68,6 @@
             android:gravity="center"
             android:hint="@string/default_server_addr"
             android:text="@string/default_server_addr" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -93,33 +92,97 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="录像参数设置"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:text="录像参数设置" />
+        android:text="选择录制方式" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Spinner
+        android:id="@+id/spinner_record_way"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
+        android:layout_gravity="end"
+        android:entries="@array/spinner_record_way"
+        android:gravity="center"
+        android:overlapAnchor="false"
+        android:paddingEnd="10dp"
+        android:spinnerMode="dropdown" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="选择录制方式" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="选择录制类型" />
 
-       <Spinner
-           android:id="@+id/spinner_record_way"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"/>
+    <Spinner
+        android:id="@+id/spinner_record_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:gravity="center"
+        android:entries="@array/spinner_record_type"
+        android:overlapAnchor="false"
+        android:paddingEnd="10dp"
+        android:spinnerMode="dropdown" />
 
-    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="选择录制对象" />
+
+    <Spinner
+        android:id="@+id/spinner_record_object"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:gravity="center"
+        android:entries="@array/spinner_record_object"
+        android:overlapAnchor="false"
+        android:paddingEnd="10dp"
+        android:spinnerMode="dropdown" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="选择画面模式" />
+
+    <Spinner
+        android:id="@+id/spinner_record_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:entries="@array/spinner_record_mode"
+        android:gravity="center"
+        android:overlapAnchor="false"
+        android:paddingEnd="10dp"
+        android:spinnerMode="dropdown" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="主窗体录像用户" />
+
+    <Spinner
+        android:id="@+id/spinner_record_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:overlapAnchor="false"
+        android:paddingEnd="10dp"
+        android:spinnerMode="dropdown" />
 
     <Button
         android:id="@+id/btn_save_setting"

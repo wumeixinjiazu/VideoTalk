@@ -10,10 +10,17 @@ import android.widget.Toast;
 
 public class ToastUtil {
 
+    private static Toast toast;
+
     public static void show(CharSequence text) {
         if (text == null) {
             return;
         }
-        Toast.makeText(AppUtil.getApp(), text, Toast.LENGTH_SHORT).show();
+        if (toast == null) {
+            toast = Toast.makeText(AppUtil.getApp(), text, Toast.LENGTH_SHORT);
+        } else {
+            toast.setText(text);
+        }
+        toast.show();
     }
 }

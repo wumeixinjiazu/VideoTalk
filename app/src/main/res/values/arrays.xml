@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="spinner_record_way">
+        <item>本地录制</item>
+        <item>服务器录制</item>
+    </string-array>
+
+    <string-array name="spinner_record_type">
+        <item>音视频</item>
+        <item>音频</item>
+        <item>视频</item>
+    </string-array>
+
+    <string-array name="spinner_record_object">
+        <item>单人</item>
+        <item>双人</item>
+        <item>全部</item>
+    </string-array>
+
+    <string-array name="spinner_record_mode">
+        <item>画中画模式</item>
+        <item>并列模式</item>
+        <item>三画面模式</item>
+    </string-array>
+
+</resources>

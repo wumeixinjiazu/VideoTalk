@@ -8,8 +8,8 @@
     <!--音频权限-->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -20,8 +20,12 @@
     如果设置为false，表示应用需要这项feature，但如果没有，可能会影响部分功能，但应用还是能够正常工作的。
     如果没有指定这项属性，则默认为true，即表示此feature是必须的。
     -->
-    <uses-feature android:name="android.hardware.Camera" android:required="true"/>
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="true"/>
+    <uses-feature
+        android:name="android.hardware.Camera"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="true" />
 
     <application
         android:name=".MyApplication"
@@ -40,8 +44,24 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".VideoActivity" android:launchMode="singleTop"/>
-        <activity android:name=".SettingActivity" android:launchMode="singleTop"/>
+        <activity
+            android:name=".VideoActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".SettingActivity"
+            android:launchMode="singleTop" />
+
+        <!--authorities的名字可自定义，一般为包名+FileProvide，resource就是刚刚新建的共享文件。-->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 
 </manifest>

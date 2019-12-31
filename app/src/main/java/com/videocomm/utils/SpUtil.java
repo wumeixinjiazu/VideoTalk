@@ -19,9 +19,14 @@ public class SpUtil {
     private static final String SERVERPORT = "server_port";//服务器端口
 
     private static final String HDSETTINGITEM = "hd_setting_item";//画质设置
-    private static final String HDCUSTOMRESOLUTION = "hd_custom_resolution";
-    private static final String HDCUSTOMFRAME = "hd_custom_frame";
-    private static final String HDCUSTOMRATE = "hd_custom_rate";
+    private static final String HDCUSTOMRESOLUTION = "hd_custom_resolution";//自定义分辨率设置
+    private static final String HDCUSTOMFRAME = "hd_custom_frame";//自定义帧率设置
+    private static final String HDCUSTOMRATE = "hd_custom_rate";//自定义码率设置
+
+    private static final String RECORD_WAY = "record_way";//录制方式
+    private static final String RECORD_TYPE = "record_type";//录制类型
+    private static final String RECORD_OBJECT = "record_object";//录制对象
+    private static final String RECORD_MODE = "record_mode";//录制模式
 
     private static SharedPreferences.Editor mEdit;
     private static SharedPreferences sp;

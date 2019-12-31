@@ -22,7 +22,9 @@ import com.bairuitech.anychat.AnyChatBaseEvent;
 import com.bairuitech.anychat.AnyChatCoreSDK;
 import com.bairuitech.anychat.AnyChatDefine;
 import com.bairuitech.anychat.AnyChatRecordEvent;
+import com.bairuitech.anychat.AnyChatTransDataEvent;
 import com.videocomm.dlgFragment.HdSettingFragment;
+import com.videocomm.dlgFragment.MoreFeatureFragment;
 import com.videocomm.utils.DisplayUtil;
 import com.videocomm.utils.ToastUtil;
 
@@ -34,7 +36,7 @@ import java.lang.ref.WeakReference;
  * @function[功能简介 视频通讯的Acitivity]
  **/
 
-public class VideoActivity extends AbsActivity implements View.OnClickListener, AnyChatBaseEvent, AnyChatRecordEvent {
+public class VideoActivity extends AbsActivity implements View.OnClickListener, AnyChatBaseEvent, AnyChatRecordEvent, AnyChatTransDataEvent {
 
     private static final String tagSdk = "VCommSdk";
 
@@ -111,11 +113,22 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
         initSdk();
+        initEvent();
         initView();
         initAudioVideo();
         initCallView();
 
 
+    }
+
+    /**
+     * 初始化各种回调事件
+     */
+    private void initEvent() {
+        anyChatSDK.SetBaseEvent(this);
+        //设置录制拍照的回调
+        anyChatSDK.SetRecordSnapShotEvent(this);
+        anyChatSDK.SetTransDataEvent(this);
     }
 
     /**
@@ -181,12 +194,10 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
      */
     private void initSdk() {
         anyChatSDK = AnyChatCoreSDK.getInstance(VideoActivity.this);
-        anyChatSDK.SetBaseEvent(this);
         anyChatSDK.mSensorHelper.InitSensor(getApplicationContext());
         anyChatSDK.CameraAutoFocus();//自动对焦
         AnyChatCoreSDK.mCameraHelper.SetContext(getApplicationContext());
-        //设置录制拍照的回调
-        anyChatSDK.SetRecordSnapShotEvent(this);
+
 
     }
 
@@ -285,7 +296,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
 
                 break;
             case R.id.ib_more://更多功能
-
+                new MoreFeatureFragment(anyChatSDK).show(getSupportFragmentManager(), "MoreFeatureFragment");
                 break;
             default:
                 for (int i = 0; i < userList.size(); i++) {
@@ -299,22 +310,21 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     }
 
     /**
-     * 切换视频
-     * 初始化 大视频都是播放自己的画面 小视频都是其他用户的画面
+     * 大小视频切换
+     * <p>
+     * 一开始大视频都是播放自己的画面 小视频都是其他用户的画面
      *
      * @param clickSmartView 当前点击切换的视频
      */
     private void switchVideo(SurfaceView clickSmartView, int position) {
-        ToastUtil.show("点中了第" + position + "个" + clickSmartView.getTag());
+
+        ToastUtil.show("点中了第" + position + "个");
 
         //获取保存在 clickSmartView 中记录的参数
         int curSmartUserId = (int) clickSmartView.getTag();
 
         //获取保存在 mSurfaceLocal 中记录的参数
         int curBigUserId = (int) mSurfaceLocal.getTag();
-
-        //更新在线人数
-        mOnlineUser = anyChatSDK.GetOnlineUser();
 
         //停止自己的音视频的传输
         anyChatSDK.UserCameraControl(-1, 0);
@@ -336,7 +346,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         clickSmartView.setOnClickListener(this);
 
         if (curSmartUserId == LoginActivity.mUserSelfId) {
-            //当前小视频是自己的画面
+            // 1.当前小视频是自己的画面
 
             // 如果是采用Java视频采集，则需要设置Surface的CallBack
             if (AnyChatCoreSDK
@@ -367,13 +377,13 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
             anyChatSDK.UserSpeakControl(curBigUserId, 1);
 
         } else {
-            //当前的小视频画面不是自己
-            //判断两种情况
-            // 1.大视频画面是自己的画面
-            // 2.大视频画面是其他用户的画面
+            // 2.当前的小视频画面不是自己
+            // 判断两种情况
+            // 2.1.大视频画面是自己的画面
+            // 2.2.大视频画面是其他用户的画面
 
             if (curBigUserId == LoginActivity.mUserSelfId) {
-                //1.大视频画面是自己的画面  一开始无论点击哪里都是走这一步
+                //2.1 大视频画面是自己的画面  一开始无论点击哪里都是走这一步
 
                 // 如果是采用Java视频采集，则需要设置Surface的CallBack  播放自己摄像头的
                 if (AnyChatCoreSDK
@@ -403,7 +413,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
                 anyChatSDK.UserCameraControl(curSmartUserId, 1);
                 anyChatSDK.UserSpeakControl(curSmartUserId, 1);
             } else {
-                //2.大视频画面是其他用户的画面
+                //2.2 大视频画面是其他用户的画面
                 // 如果是采用Java视频显示，则需要设置Surface的CallBack 其他用户都是设置这个
                 if (AnyChatCoreSDK
                         .GetSDKOptionInt(AnyChatDefine.BRAC_SO_VIDEOSHOW_DRIVERCTRL) == AnyChatDefine.VIDEOSHOW_DRIVER_JAVA) {
@@ -439,14 +449,6 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         mSurfaceLocal.setZOrderOnTop(false);
         clickSmartView.setZOrderOnTop(true);
 
-        //开启自己的音视频的传输
-        anyChatSDK.UserCameraControl(-1, 1);
-        anyChatSDK.UserSpeakControl(-1, 1);
-
-        //开启对方的音视频的传输
-        anyChatSDK.UserCameraControl(curSmartUserId, 1);
-        anyChatSDK.UserSpeakControl(curSmartUserId, 1);
-
         //获取系统的宽高设置给小视频的宽高
         int width = DisplayUtil.getScreenWidth() / 3;
         int heigth = DisplayUtil.getScreenHeight() / 3;
@@ -471,7 +473,8 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
 
     private void stopRecord() {
         int flag = AnyChatDefine.ANYCHAT_RECORD_FLAGS_VIDEO + AnyChatDefine.ANYCHAT_RECORD_FLAGS_AUDIO;
-        int state = anyChatSDK.StreamRecordCtrlEx(-1, 0, flag, 12306, "");
+        //停止录制
+        anyChatSDK.StreamRecordCtrlEx(-1, 0, flag, 12306, "");
 
         if (isRecordState) {
             ibRecord.setBackgroundResource(R.drawable.ic_record_default);//切换成暂停录制
@@ -487,6 +490,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     private void startRecord() {
 
         int flag = AnyChatDefine.ANYCHAT_RECORD_FLAGS_VIDEO + AnyChatDefine.ANYCHAT_RECORD_FLAGS_AUDIO + AnyChatDefine.ANYCHAT_RECORD_FLAGS_ABREAST + AnyChatDefine.ANYCHAT_RECORD_FLAGS_STEREO;
+        //开始录制 1 为开始 0 为停止
         int state = anyChatSDK.StreamRecordCtrlEx(-1, 1, flag, 12306, "");
         if (state != 0) {
             ToastUtil.show("录制失败" + state);
@@ -694,17 +698,58 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     /**
      * 图像抓拍完成事件
      *
-     * @param dwUserId
-     * @param dwErrorCode
-     * @param lpFileName
-     * @param dwFlags
-     * @param dwParam
-     * @param lpUserStr
+     * @param dwUserId    被拍照用户 ID
+     * @param dwErrorCode 错误代码
+     * @param lpFileName  文件保存路径
+     * @param dwFlags     拍照标志
+     * @param dwParam     用户自定义参数，整型
+     * @param lpUserStr   用户自定义参数，字符串类型
      */
     @Override
     public void OnAnyChatSnapShotEvent(int dwUserId, int dwErrorCode, String lpFileName, int dwFlags, int dwParam, String lpUserStr) {
+        Log.i(tag, "被拍照用户 ID" + dwUserId);
+        Log.i(tag, "文件保存路径" + lpFileName);
+        Log.i(tag, "拍照标志" + dwFlags);
+        Log.i(tag, "用户自定义参数，整型" + dwParam);
+        Log.i(tag, "用户自定义参数，字符串类型" + lpUserStr);
 
     }
 
+    /**
+     * 收到文件传输数据事件
+     *
+     * @param dwUserid     用户 ID，指示发送用户
+     * @param FileName     文件名（含扩展名，不含路径）
+     * @param TempFilePath 接收完成后，SDK 保存在本地的临时文件（包含完整路径）
+     * @param dwFileLength 文件总长度
+     * @param wParam       附带参数 1
+     * @param lParam       附带参数 2
+     * @param dwTaskId     该文件所对应的任务编号
+     */
+    @Override
+    public void OnAnyChatTransFile(int dwUserid, String FileName, String TempFilePath, int dwFileLength, int wParam, int lParam, int dwTaskId) {
+        Log.i(tag,"用户 ID，指示发送用户"+dwUserid);
+        Log.i(tag,"文件名（含扩展名，不含路径）"+FileName);
+        Log.i(tag,"接收完成后，SDK 保存在本地的临时文件（包含完整路径）"+TempFilePath);
+        Log.i(tag,"文件总长度"+dwFileLength);
+        Log.i(tag,"附带参数 1"+wParam);
+        Log.i(tag,"附带参数 2"+lParam);
+        Log.i(tag,"该文件所对应的任务编号"+dwTaskId);
+    }
+
+    @Override
+    public void OnAnyChatTransBuffer(int dwUserid, byte[] lpBuf, int dwLen) {
+
+    }
+
+    @Override
+    public void OnAnyChatTransBufferEx(int dwUserid, byte[] lpBuf, int dwLen, int wparam, int lparam, int taskid) {
+
+    }
+
+    @Override
+    public void OnAnyChatSDKFilterData(byte[] lpBuf, int dwLen) {
+
+    }
 }
 
