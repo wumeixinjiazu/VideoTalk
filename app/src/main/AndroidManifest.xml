@@ -36,7 +36,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".LoginActivity">
+        <activity android:name=".activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,10 +45,10 @@
         </activity>
 
         <activity
-            android:name=".VideoActivity"
+            android:name=".activity.VideoActivity"
             android:launchMode="singleTop" />
         <activity
-            android:name=".SettingActivity"
+            android:name=".activity.SettingActivity"
             android:launchMode="singleTop" />
 
         <!--authorities的名字可自定义，一般为包名+FileProvide，resource就是刚刚新建的共享文件。-->

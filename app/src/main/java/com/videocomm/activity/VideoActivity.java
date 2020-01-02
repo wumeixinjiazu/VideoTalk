@@ -1,4 +1,4 @@
-package com.videocomm;
+package com.videocomm.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -17,12 +17,14 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.Group;
 
 import com.bairuitech.anychat.AnyChatBaseEvent;
 import com.bairuitech.anychat.AnyChatCoreSDK;
 import com.bairuitech.anychat.AnyChatDefine;
 import com.bairuitech.anychat.AnyChatRecordEvent;
 import com.bairuitech.anychat.AnyChatTransDataEvent;
+import com.videocomm.R;
 import com.videocomm.dlgFragment.HdSettingFragment;
 import com.videocomm.dlgFragment.MoreFeatureFragment;
 import com.videocomm.utils.DisplayUtil;
@@ -36,15 +38,13 @@ import java.lang.ref.WeakReference;
  * @function[功能简介 视频通讯的Acitivity]
  **/
 
-public class VideoActivity extends AbsActivity implements View.OnClickListener, AnyChatBaseEvent, AnyChatRecordEvent, AnyChatTransDataEvent {
+public class VideoActivity extends BaseActivity implements View.OnClickListener, AnyChatBaseEvent, AnyChatRecordEvent, AnyChatTransDataEvent {
 
     private static final String tagSdk = "VCommSdk";
 
     private String tag = this.getClass().getSimpleName();
 
     private SurfaceView mSurfaceLocal;
-
-    public AnyChatCoreSDK anyChatSDK;
 
     private LinearLayout llVideoControl;
 
@@ -81,6 +81,9 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
 
     private VideoHandler mHandler = new VideoHandler(this);
     private ConstraintLayout mVideoMainLayout;
+    /**
+     * 视频界面所有的功能按钮
+     */
     private LinearLayout mLlControl;
 
     static class VideoHandler extends Handler {
@@ -104,7 +107,6 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
 
                 activity.mHandler.sendEmptyMessageDelayed(0, 1000);//继续一秒发送一条空消息，实现切换
             }
-
         }
     }
 
@@ -112,30 +114,27 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
-        initSdk();
+        initSDK();
         initEvent();
         initView();
         initAudioVideo();
         initCallView();
-
-
     }
 
     /**
      * 初始化各种回调事件
      */
     private void initEvent() {
-        anyChatSDK.SetBaseEvent(this);
         //设置录制拍照的回调
-        anyChatSDK.SetRecordSnapShotEvent(this);
-        anyChatSDK.SetTransDataEvent(this);
+        mAnyChatSDK.SetRecordSnapShotEvent(this);
+        mAnyChatSDK.SetTransDataEvent(this);
     }
 
     /**
      * 根据房间人数 初始化对应的视频
      */
     private void initCallView() {
-        mOnlineUser = anyChatSDK.GetOnlineUser();//获取在线的用户的id 不包括自己
+        mOnlineUser = mAnyChatSDK.GetOnlineUser();//获取在线的用户的id 不包括自己
         userList.clear();
 
         if (mOnlineUser.length > 0) {
@@ -162,9 +161,8 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
             mSurfaceLocal.getHolder().addCallback(AnyChatCoreSDK.mCameraHelper);
         }
 
-
-        anyChatSDK.UserCameraControl(-1, 1);// -1表示对本地视频进行控制，打开本地视频
-        anyChatSDK.UserSpeakControl(-1, 1);// -1表示对本地音频进行控制，打开本地音频
+        mAnyChatSDK.UserCameraControl(-1, 1);// -1表示对本地视频进行控制，打开本地视频
+        mAnyChatSDK.UserSpeakControl(-1, 1);// -1表示对本地音频进行控制，打开本地音频
 
         // 判断是否显示本地摄像头切换图标
         if (AnyChatCoreSDK
@@ -175,13 +173,13 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
                         .SelectVideoCapture(AnyChatCoreSDK.mCameraHelper.CAMERA_FACING_FRONT);
             }
         } else {
-            String[] strVideoCaptures = anyChatSDK.EnumVideoCapture();
+            String[] strVideoCaptures = mAnyChatSDK.EnumVideoCapture();
             if (strVideoCaptures != null && strVideoCaptures.length > 1) {
                 // 默认打开前置摄像头
                 for (int i = 0; i < strVideoCaptures.length; i++) {
                     String strDevices = strVideoCaptures[i];
                     if (strDevices.indexOf("Front") >= 0) {
-                        anyChatSDK.SelectVideoCapture(strDevices);
+                        mAnyChatSDK.SelectVideoCapture(strDevices);
                         break;
                     }
                 }
@@ -192,13 +190,11 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     /**
      * 初始化SDK
      */
-    private void initSdk() {
-        anyChatSDK = AnyChatCoreSDK.getInstance(VideoActivity.this);
-        anyChatSDK.mSensorHelper.InitSensor(getApplicationContext());
-        anyChatSDK.CameraAutoFocus();//自动对焦
+    private void initSDK() {
+        mAnyChatSDK = AnyChatCoreSDK.getInstance(VideoActivity.this);
+        mAnyChatSDK.mSensorHelper.InitSensor(getApplicationContext());
+        mAnyChatSDK.CameraAutoFocus();//自动对焦
         AnyChatCoreSDK.mCameraHelper.SetContext(getApplicationContext());
-
-
     }
 
     /**
@@ -217,15 +213,13 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         mVideoMainLayout = findViewById(R.id.video_main);
         mLlControl = findViewById(R.id.ll_control);
 
-        mSurfaceLocal.setTag(LoginActivity.mUserSelfId);
+        mSurfaceLocal.setTag(mUserSelfId);
 
         ibCameraReset.setOnClickListener(this);
         ibHangUp.setOnClickListener(this);
         ibHdSetting.setOnClickListener(this);
         ibMore.setOnClickListener(this);
         ibRecord.setOnClickListener(this);
-
-
     }
 
     /**
@@ -242,9 +236,9 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         // 如果是采用Java视频显示，则需要设置Surface的CallBack
         if (AnyChatCoreSDK
                 .GetSDKOptionInt(AnyChatDefine.BRAC_SO_VIDEOSHOW_DRIVERCTRL) == AnyChatDefine.VIDEOSHOW_DRIVER_JAVA) {
-            int index = anyChatSDK.mVideoHelper.bindVideo(mSurfaceRemote
+            int index = mAnyChatSDK.mVideoHelper.bindVideo(mSurfaceRemote
                     .getHolder());
-            anyChatSDK.mVideoHelper.SetVideoUser(index, userId);
+            mAnyChatSDK.mVideoHelper.SetVideoUser(index, userId);
         }
 
         mSurfaceRemote.setTag(userId);//记录视频的用户id
@@ -252,8 +246,8 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         mSurfaceRemote.setOnClickListener(this);
         mSurfaceRemote.setZOrderOnTop(true);
 
-        anyChatSDK.UserCameraControl(userId, 1);//打开对方视频进行控制，打开本地视频
-        anyChatSDK.UserSpeakControl(userId, 1);//打开对方音频进行控制，打开本地视频
+        mAnyChatSDK.UserCameraControl(userId, 1);//打开对方视频进行控制，打开本地视频
+        mAnyChatSDK.UserSpeakControl(userId, 1);//打开对方音频进行控制，打开本地视频
 
         llVideoControl.addView(mSurfaceRemote, lp);
 
@@ -266,6 +260,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
                 new HdSettingFragment().show(getSupportFragmentManager(), "HdSettingDialog");
                 break;
             case R.id.ib_camera_reset://相机翻转
+
                 // 如果是采用Java视频采集，则在Java层进行摄像头切换
                 if (AnyChatCoreSDK
                         .GetSDKOptionInt(AnyChatDefine.BRAC_SO_LOCALVIDEO_CAPDRIVER) == AnyChatDefine.VIDEOCAP_DRIVER_JAVA) {
@@ -273,13 +268,13 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
                     return;
                 }
 
-                String strVideoCaptures[] = anyChatSDK.EnumVideoCapture();
-                String temp = anyChatSDK.GetCurVideoCapture();
+                String[] strVideoCaptures = mAnyChatSDK.EnumVideoCapture();
+                String temp = mAnyChatSDK.GetCurVideoCapture();
                 for (int i = 0; i < strVideoCaptures.length; i++) {
                     if (!temp.equals(strVideoCaptures[i])) {
-                        anyChatSDK.UserCameraControl(-1, 0);
-                        anyChatSDK.SelectVideoCapture(strVideoCaptures[i]);
-                        anyChatSDK.UserCameraControl(-1, 1);
+                        mAnyChatSDK.UserCameraControl(-1, 0);
+                        mAnyChatSDK.SelectVideoCapture(strVideoCaptures[i]);
+                        mAnyChatSDK.UserCameraControl(-1, 1);
                         break;
                     }
                 }
@@ -296,11 +291,12 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
 
                 break;
             case R.id.ib_more://更多功能
-                new MoreFeatureFragment(anyChatSDK).show(getSupportFragmentManager(), "MoreFeatureFragment");
+                new MoreFeatureFragment(mAnyChatSDK,mUserSelfId).show(getSupportFragmentManager(), "MoreFeatureFragment");
                 break;
             default:
                 for (int i = 0; i < userList.size(); i++) {
                     SurfaceView clickSmartView = (SurfaceView) llVideoControl.getChildAt(i);
+                    //获取被点击的视频判断是否与小视频控件一样
                     if (v == clickSmartView) {
                         switchVideo(clickSmartView, i);
                     }
@@ -310,11 +306,12 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     }
 
     /**
-     * 大小视频切换
+     * 大小视频切换 （主要是把之前绑定的控件SurfaceView移除掉，然后重新设置渲染）
      * <p>
      * 一开始大视频都是播放自己的画面 小视频都是其他用户的画面
      *
-     * @param clickSmartView 当前点击切换的视频
+     * @param clickSmartView 当前点击切的视频
+     * @param position       被点击的小视频的位置
      */
     private void switchVideo(SurfaceView clickSmartView, int position) {
 
@@ -327,12 +324,12 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         int curBigUserId = (int) mSurfaceLocal.getTag();
 
         //停止自己的音视频的传输
-        anyChatSDK.UserCameraControl(-1, 0);
-        anyChatSDK.UserSpeakControl(-1, 0);
+        mAnyChatSDK.UserCameraControl(-1, 0);
+        mAnyChatSDK.UserSpeakControl(-1, 0);
 
         //停止对方的音视频的传输
-        anyChatSDK.UserCameraControl(curSmartUserId, 0);
-        anyChatSDK.UserSpeakControl(curSmartUserId, 0);
+        mAnyChatSDK.UserCameraControl(curSmartUserId, 0);
+        mAnyChatSDK.UserSpeakControl(curSmartUserId, 0);
 
         //移除控件
         llVideoControl.removeView(clickSmartView);
@@ -345,7 +342,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         //设置监听
         clickSmartView.setOnClickListener(this);
 
-        if (curSmartUserId == LoginActivity.mUserSelfId) {
+        if (curSmartUserId == mUserSelfId) {
             // 1.当前小视频是自己的画面
 
             // 如果是采用Java视频采集，则需要设置Surface的CallBack
@@ -357,24 +354,24 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
             // 如果是采用Java视频显示，则需要设置Surface的CallBack
             if (AnyChatCoreSDK
                     .GetSDKOptionInt(AnyChatDefine.BRAC_SO_VIDEOSHOW_DRIVERCTRL) == AnyChatDefine.VIDEOSHOW_DRIVER_JAVA) {
-                int index = anyChatSDK.mVideoHelper.bindVideo(clickSmartView
+                int index = mAnyChatSDK.mVideoHelper.bindVideo(clickSmartView
                         .getHolder());
-                anyChatSDK.mVideoHelper.SetVideoUser(index, curBigUserId);
+                mAnyChatSDK.mVideoHelper.SetVideoUser(index, curBigUserId);
             }
 
             //改变当前小视频视图的参数
             clickSmartView.setTag(curBigUserId);
 
             //改变当前大视频视图的参数
-            mSurfaceLocal.setTag(LoginActivity.mUserSelfId);
+            mSurfaceLocal.setTag(mUserSelfId);
 
             //开启自己的音视频的传输
-            anyChatSDK.UserCameraControl(-1, 1);
-            anyChatSDK.UserSpeakControl(-1, 1);
+            mAnyChatSDK.UserCameraControl(-1, 1);
+            mAnyChatSDK.UserSpeakControl(-1, 1);
 
             //开启对方的音视频的传输
-            anyChatSDK.UserCameraControl(curBigUserId, 1);
-            anyChatSDK.UserSpeakControl(curBigUserId, 1);
+            mAnyChatSDK.UserCameraControl(curBigUserId, 1);
+            mAnyChatSDK.UserSpeakControl(curBigUserId, 1);
 
         } else {
             // 2.当前的小视频画面不是自己
@@ -382,7 +379,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
             // 2.1.大视频画面是自己的画面
             // 2.2.大视频画面是其他用户的画面
 
-            if (curBigUserId == LoginActivity.mUserSelfId) {
+            if (curBigUserId == mUserSelfId) {
                 //2.1 大视频画面是自己的画面  一开始无论点击哪里都是走这一步
 
                 // 如果是采用Java视频采集，则需要设置Surface的CallBack  播放自己摄像头的
@@ -394,40 +391,40 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
                 // 如果是采用Java视频显示，则需要设置Surface的CallBack 其他用户都是设置这个
                 if (AnyChatCoreSDK
                         .GetSDKOptionInt(AnyChatDefine.BRAC_SO_VIDEOSHOW_DRIVERCTRL) == AnyChatDefine.VIDEOSHOW_DRIVER_JAVA) {
-                    int index = anyChatSDK.mVideoHelper.bindVideo(mSurfaceLocal
+                    int index = mAnyChatSDK.mVideoHelper.bindVideo(mSurfaceLocal
                             .getHolder());
-                    anyChatSDK.mVideoHelper.SetVideoUser(index, curSmartUserId);
+                    mAnyChatSDK.mVideoHelper.SetVideoUser(index, curSmartUserId);
                 }
 
                 //改变当前小视频视图的参数
-                clickSmartView.setTag(LoginActivity.mUserSelfId);
+                clickSmartView.setTag(mUserSelfId);
 
                 //改变当前大视频视图的参数
                 mSurfaceLocal.setTag(curSmartUserId);
 
                 //开启自己的音视频的传输
-                anyChatSDK.UserCameraControl(-1, 1);
-                anyChatSDK.UserSpeakControl(-1, 1);
+                mAnyChatSDK.UserCameraControl(-1, 1);
+                mAnyChatSDK.UserSpeakControl(-1, 1);
 
                 //开启对方的音视频的传输
-                anyChatSDK.UserCameraControl(curSmartUserId, 1);
-                anyChatSDK.UserSpeakControl(curSmartUserId, 1);
+                mAnyChatSDK.UserCameraControl(curSmartUserId, 1);
+                mAnyChatSDK.UserSpeakControl(curSmartUserId, 1);
             } else {
                 //2.2 大视频画面是其他用户的画面
                 // 如果是采用Java视频显示，则需要设置Surface的CallBack 其他用户都是设置这个
                 if (AnyChatCoreSDK
                         .GetSDKOptionInt(AnyChatDefine.BRAC_SO_VIDEOSHOW_DRIVERCTRL) == AnyChatDefine.VIDEOSHOW_DRIVER_JAVA) {
-                    int index = anyChatSDK.mVideoHelper.bindVideo(clickSmartView
+                    int index = mAnyChatSDK.mVideoHelper.bindVideo(clickSmartView
                             .getHolder());
-                    anyChatSDK.mVideoHelper.SetVideoUser(index, curBigUserId);
+                    mAnyChatSDK.mVideoHelper.SetVideoUser(index, curBigUserId);
                 }
 
                 // 如果是采用Java视频显示，则需要设置Surface的CallBack 其他用户都是设置这个
                 if (AnyChatCoreSDK
                         .GetSDKOptionInt(AnyChatDefine.BRAC_SO_VIDEOSHOW_DRIVERCTRL) == AnyChatDefine.VIDEOSHOW_DRIVER_JAVA) {
-                    int index = anyChatSDK.mVideoHelper.bindVideo(mSurfaceLocal
+                    int index = mAnyChatSDK.mVideoHelper.bindVideo(mSurfaceLocal
                             .getHolder());
-                    anyChatSDK.mVideoHelper.SetVideoUser(index, curSmartUserId);
+                    mAnyChatSDK.mVideoHelper.SetVideoUser(index, curSmartUserId);
                 }
                 ;
                 //改变当前小视频视图的参数
@@ -437,12 +434,12 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
                 mSurfaceLocal.setTag(curSmartUserId);
 
                 //开启凯队的音视频的传输
-                anyChatSDK.UserCameraControl(curBigUserId, 1);
-                anyChatSDK.UserSpeakControl(curBigUserId, 1);
+                mAnyChatSDK.UserCameraControl(curBigUserId, 1);
+                mAnyChatSDK.UserSpeakControl(curBigUserId, 1);
 
                 //开启对方的音视频的传输
-                anyChatSDK.UserCameraControl(curSmartUserId, 1);
-                anyChatSDK.UserSpeakControl(curSmartUserId, 1);
+                mAnyChatSDK.UserCameraControl(curSmartUserId, 1);
+                mAnyChatSDK.UserSpeakControl(curSmartUserId, 1);
             }
         }
         //设置SurfaceLocal控件是不是置于最上面
@@ -461,7 +458,7 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         //添加小视频
         llVideoControl.addView(clickSmartView, position, lp);
 
-        //移除视频界面全部功能按钮
+        //移除视频界面的全部功能按钮
         mVideoMainLayout.removeView(mLlControl);
         ConstraintLayout.LayoutParams llControlParams = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
         llControlParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
@@ -471,10 +468,13 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         mVideoMainLayout.addView(mLlControl, llControlParams);
     }
 
+    /**
+     * 停止录制
+     */
     private void stopRecord() {
         int flag = AnyChatDefine.ANYCHAT_RECORD_FLAGS_VIDEO + AnyChatDefine.ANYCHAT_RECORD_FLAGS_AUDIO;
         //停止录制
-        anyChatSDK.StreamRecordCtrlEx(-1, 0, flag, 12306, "");
+        mAnyChatSDK.StreamRecordCtrlEx(-1, 0, flag, 12306, "");
 
         if (isRecordState) {
             ibRecord.setBackgroundResource(R.drawable.ic_record_default);//切换成暂停录制
@@ -487,11 +487,15 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         mHandler.removeCallbacksAndMessages(null);
     }
 
+    /**
+     * 开启录制
+     */
     private void startRecord() {
-
+        chronometer.setVisibility(View.GONE);//录制计时器显示
+        ivRecordState.setVisibility(View.GONE);//正在录制图标显示
         int flag = AnyChatDefine.ANYCHAT_RECORD_FLAGS_VIDEO + AnyChatDefine.ANYCHAT_RECORD_FLAGS_AUDIO + AnyChatDefine.ANYCHAT_RECORD_FLAGS_ABREAST + AnyChatDefine.ANYCHAT_RECORD_FLAGS_STEREO;
         //开始录制 1 为开始 0 为停止
-        int state = anyChatSDK.StreamRecordCtrlEx(-1, 1, flag, 12306, "");
+        int state = mAnyChatSDK.StreamRecordCtrlEx(-1, 1, flag, 12306, "");
         if (state != 0) {
             ToastUtil.show("录制失败" + state);
             return;
@@ -515,24 +519,24 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         super.onRestart();
         //用户切回来的时候走这个方法
         //这时候要对用户的音视频进行打开操作
-        mOnlineUser = anyChatSDK.GetOnlineUser();//更新一下在线人数
+        mOnlineUser = mAnyChatSDK.GetOnlineUser();//更新一下在线人数
         for (int i = 0; i < mOnlineUser.length; i++) {
             //打开其他用户的音视频
-            anyChatSDK.UserCameraControl(mOnlineUser[i], 1);
-            anyChatSDK.UserSpeakControl(mOnlineUser[i], 1);
+            mAnyChatSDK.UserCameraControl(mOnlineUser[i], 1);
+            mAnyChatSDK.UserSpeakControl(mOnlineUser[i], 1);
 
             // 如果是采用Java视频显示，则需要设置Surface的CallBack
             SurfaceView surfaceViewRemote = (SurfaceView) llVideoControl.getChildAt(i);
             if (AnyChatCoreSDK
                     .GetSDKOptionInt(AnyChatDefine.BRAC_SO_VIDEOSHOW_DRIVERCTRL) == AnyChatDefine.VIDEOSHOW_DRIVER_JAVA) {
-                int index = anyChatSDK.mVideoHelper.bindVideo(surfaceViewRemote
+                int index = mAnyChatSDK.mVideoHelper.bindVideo(surfaceViewRemote
                         .getHolder());
-                anyChatSDK.mVideoHelper.SetVideoUser(index, mOnlineUser[i]);
+                mAnyChatSDK.mVideoHelper.SetVideoUser(index, mOnlineUser[i]);
             }
         }
 
-        anyChatSDK.UserCameraControl(-1, 1);//-1表示对本地视频进行控制，打开本地视频
-        anyChatSDK.UserSpeakControl(-1, 1);//-1表示对本地音频进行控制，打开本地视频
+        mAnyChatSDK.UserCameraControl(-1, 1);//-1表示对本地视频进行控制，打开本地视频
+        mAnyChatSDK.UserSpeakControl(-1, 1);//-1表示对本地音频进行控制，打开本地视频
     }
 
     @Override
@@ -540,15 +544,15 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         super.onPause();
         //用户切出去的时候走这个方法
         // 这时候要对用户的音视频进行关闭操作
-        mOnlineUser = anyChatSDK.GetOnlineUser();//更新一下在线人数
+        mOnlineUser = mAnyChatSDK.GetOnlineUser();//更新一下在线人数
         for (int i = 0; i < mOnlineUser.length; i++) {
             //关闭其他用户的音视频
-            anyChatSDK.UserCameraControl(mOnlineUser[i], 0);
-            anyChatSDK.UserSpeakControl(mOnlineUser[i], 0);
+            mAnyChatSDK.UserCameraControl(mOnlineUser[i], 0);
+            mAnyChatSDK.UserSpeakControl(mOnlineUser[i], 0);
         }
 
-        anyChatSDK.UserCameraControl(-1, 0);//-1表示对本地视频进行控制，关闭本地视频
-        anyChatSDK.UserSpeakControl(-1, 0);//-1表示对本地音频进行控制，关闭本地视频
+        mAnyChatSDK.UserCameraControl(-1, 0);//-1表示对本地视频进行控制，关闭本地视频
+        mAnyChatSDK.UserSpeakControl(-1, 0);//-1表示对本地音频进行控制，关闭本地视频
 
     }
 
@@ -557,30 +561,15 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
         super.onDestroy();
         Log.i(tag, "onDestroy");
         llVideoControl.removeAllViews();
-        anyChatSDK.UserCameraControl(-1, 0);// -1表示对本地视频进行控制，关闭本地视频
-        anyChatSDK.UserSpeakControl(-1, 0);// -1表示对本地音频进行控制，关闭本地音频
-        anyChatSDK.removeEvent(this);
-        anyChatSDK.LeaveRoom(-1);
-        anyChatSDK.Logout();
-        anyChatSDK.mSensorHelper.DestroySensor();
+        mAnyChatSDK.UserCameraControl(-1, 0);// -1表示对本地视频进行控制，关闭本地视频
+        mAnyChatSDK.UserSpeakControl(-1, 0);// -1表示对本地音频进行控制，关闭本地音频
+        mAnyChatSDK.removeEvent(this);
+        mAnyChatSDK.LeaveRoom(-1);
+        mAnyChatSDK.Logout();
+        mAnyChatSDK.mSensorHelper.DestroySensor();
+
         mHandler.removeCallbacksAndMessages(null);
         mHandler = null;//防止内存泄露
-    }
-
-    /**
-     * 连接服务器消息, bSuccess表示是否连接成功
-     *
-     * @param bSuccess
-     */
-    @Override
-    public void OnAnyChatConnectMessage(boolean bSuccess) {
-
-        Log.i(tag, "连接服务器消息" + bSuccess);
-        if (!bSuccess) {
-            ToastUtil.show("连接服务器失败，自动重连，请稍后...");
-            System.out.println("connect failed");
-        }
-        ToastUtil.show("连接服务器成功");
     }
 
     /**
@@ -600,30 +589,6 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
     }
 
     /**
-     * 用户进入房间消息，dwRoomId表示所进入房间的ID号，dwErrorCode表示是否进入房间：0成功进入，否则为出错代码
-     *
-     * @param dwRoomId
-     * @param dwErrorCode
-     */
-    @Override
-    public void OnAnyChatEnterRoomMessage(int dwRoomId, int dwErrorCode) {
-        Log.i(tag, "用户进入房间消息 dwRoomId表示所进入房间的ID号:" + dwRoomId + "-dwErrorCode:" + dwErrorCode);
-
-    }
-
-    /**
-     * 房间在线用户消息，进入房间后触发一次，dwUserNum表示在线用户数（包含自己），dwRoomId表示房间ID
-     *
-     * @param dwUserNum
-     * @param dwRoomId
-     */
-    @Override
-    public void OnAnyChatOnlineUserMessage(int dwUserNum, int dwRoomId) {
-        Log.i(tag, "房间在线用户消息 dwUserNum表示在线用户数（包含自己）:" + dwUserNum + "-dwRoomId表示房间ID:" + dwRoomId);
-
-    }
-
-    /**
      * 用户进入/退出房间消息，dwUserId表示用户ID号，bEnter表示该用户是进入（TRUE）或离开（FALSE）房间
      *
      * @param dwUserId
@@ -639,18 +604,18 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
             }
 
             Log.i(tag, "进来一个用户 ID为" + dwUserId);
-            Log.i(tag, "进来一个用户 用户名为" + anyChatSDK.GetUserName(dwUserId));
+            Log.i(tag, "进来一个用户 用户名为" + mAnyChatSDK.GetUserName(dwUserId));
             userList.put(Math.abs(dwUserId), Math.abs(dwUserId));//把用户的id存进数组
             createOtherVideoView(dwUserId);//创建一个用户视图
         } else {
             //退出房间
             Log.i(tag, "退出一个用户 ID为" + dwUserId);
-            Log.i(tag, "退出一个用户 用户名为" + anyChatSDK.GetUserName(dwUserId));
-            anyChatSDK.UserCameraControl(dwUserId, 0);
-            anyChatSDK.UserSpeakControl(dwUserId, 0);
-            if (dwUserId != LoginActivity.mUserSelfId) { //第一次进来会走到这个方法，需要做个判断，防止空指针
+            Log.i(tag, "退出一个用户 用户名为" + mAnyChatSDK.GetUserName(dwUserId));
+            mAnyChatSDK.UserCameraControl(dwUserId, 0);
+            mAnyChatSDK.UserSpeakControl(dwUserId, 0);
+            if (dwUserId != mUserSelfId) { //第一次进来会走到这个方法，需要做个判断，防止空指针
                 Log.i(tag, "退出一个用户 ID索引" + userList.indexOfValue(Math.abs(dwUserId)));
-                Log.i(tag, "退出一个用户 用户名为" + anyChatSDK.GetUserName(dwUserId));
+                Log.i(tag, "退出一个用户 用户名为" + mAnyChatSDK.GetUserName(dwUserId));
 
                 llVideoControl.removeViewAt(userList.indexOfValue(Math.abs(dwUserId)));//根据退出的用户id查出索引移除view
                 userList.removeAt(userList.indexOfValue(Math.abs(dwUserId)));//移除索引对应的数值
@@ -658,17 +623,6 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
             }
             ToastUtil.show("用户" + dwUserId + "离开房间");
         }
-
-    }
-
-    /**
-     * 网络断开消息，该消息只有在客户端连接服务器成功之后，网络异常中断之时触发，dwErrorCode表示连接断开的原因
-     *
-     * @param dwErrorCode
-     */
-    @Override
-    public void OnAnyChatLinkCloseMessage(int dwErrorCode) {
-
     }
 
     /**
@@ -728,13 +682,13 @@ public class VideoActivity extends AbsActivity implements View.OnClickListener, 
      */
     @Override
     public void OnAnyChatTransFile(int dwUserid, String FileName, String TempFilePath, int dwFileLength, int wParam, int lParam, int dwTaskId) {
-        Log.i(tag,"用户 ID，指示发送用户"+dwUserid);
-        Log.i(tag,"文件名（含扩展名，不含路径）"+FileName);
-        Log.i(tag,"接收完成后，SDK 保存在本地的临时文件（包含完整路径）"+TempFilePath);
-        Log.i(tag,"文件总长度"+dwFileLength);
-        Log.i(tag,"附带参数 1"+wParam);
-        Log.i(tag,"附带参数 2"+lParam);
-        Log.i(tag,"该文件所对应的任务编号"+dwTaskId);
+        Log.i(tag, "用户 ID，指示发送用户" + dwUserid);
+        Log.i(tag, "文件名（含扩展名，不含路径）" + FileName);
+        Log.i(tag, "接收完成后，SDK 保存在本地的临时文件（包含完整路径）" + TempFilePath);
+        Log.i(tag, "文件总长度" + dwFileLength);
+        Log.i(tag, "附带参数 1" + wParam);
+        Log.i(tag, "附带参数 2" + lParam);
+        Log.i(tag, "该文件所对应的任务编号" + dwTaskId);
     }
 
     @Override

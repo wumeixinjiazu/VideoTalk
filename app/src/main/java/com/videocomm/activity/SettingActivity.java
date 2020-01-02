@@ -1,4 +1,4 @@
-package com.videocomm;
+package com.videocomm.activity;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.videocomm.R;
 import com.videocomm.utils.SpUtil;
 import com.videocomm.utils.ToastUtil;
 
@@ -19,7 +20,7 @@ import com.videocomm.utils.ToastUtil;
  * @function[功能简介 登陆界面中的设置界面Activity]
  **/
 
-public class SettingActivity extends AbsActivity implements View.OnClickListener {
+public class SettingActivity extends BaseActivity implements View.OnClickListener {
 
     private TextView tvSdkVersion;
     private EditText etAppId;

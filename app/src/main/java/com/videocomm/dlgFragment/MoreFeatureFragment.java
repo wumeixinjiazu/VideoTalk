@@ -3,26 +3,16 @@ package com.videocomm.dlgFragment;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageButton;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 
 import com.bairuitech.anychat.AnyChatCoreSDK;
 import com.bairuitech.anychat.AnyChatOutParam;
-import com.videocomm.LoginActivity;
+import com.videocomm.activity.LoginActivity;
 import com.videocomm.R;
 import com.videocomm.utils.ToastUtil;
 
@@ -31,43 +21,36 @@ import com.videocomm.utils.ToastUtil;
  * @version[创建日期，2019/12/30 0030]
  * @function[功能简介]
  **/
-public class MoreFeatureFragment extends DialogFragment implements View.OnClickListener {
+public class MoreFeatureFragment extends BaseDlgFragment implements View.OnClickListener {
 
+    /**
+     * 打开系统文件管理器的请求码
+     */
     private static final int OPEN_SYSTEM_FILE_MANAGER_CODE = 1;
 
     private AnyChatCoreSDK anyChatSDK;
     private String tag = this.getClass().getSimpleName();
+    private int mUserSelfId;
 
-    public MoreFeatureFragment(AnyChatCoreSDK anyChatSDK) {
+    public MoreFeatureFragment(AnyChatCoreSDK anyChatSDK, int mUserSelfId) {
 
         this.anyChatSDK = anyChatSDK;
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Window window = getDialog().getWindow();
-        View view = inflater.inflate(R.layout.dlg_more_feature, ((ViewGroup) window.findViewById(android.R.id.content)), false);//需要用android.R.id.content这个view
-        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));//注意此处
-        window.setGravity(Gravity.BOTTOM);
-        window.setLayout(-1, -2);//这2行,和上面的一样,注意顺序就行
-        WindowManager.LayoutParams lp = window.getAttributes();
-        lp.windowAnimations = R.style.HdSettingAnimation;//设置DialogFragment的动画
-        lp.height = 500;
-        window.setAttributes(lp);
-        return view;
+        this.mUserSelfId = mUserSelfId;
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    protected int initLayout() {
+        return R.layout.dlg_more_feature;
+    }
+
+    @Override
+    protected void initView(View view) {
 
         ImageButton ibSnapShoot = view.findViewById(R.id.ib_snap_shoot);
         ImageButton ibUploadFile = view.findViewById(R.id.ib_upload_file);
 
         ibSnapShoot.setOnClickListener(this);
         ibUploadFile.setOnClickListener(this);
-
     }
 
     @Override
@@ -84,6 +67,9 @@ public class MoreFeatureFragment extends DialogFragment implements View.OnClickL
         }
     }
 
+    /**
+     * 打开用户列表
+     */
     private void openUsersList() {
 
         //获取在线的人数 不包括自己
@@ -93,7 +79,7 @@ public class MoreFeatureFragment extends DialogFragment implements View.OnClickL
         String[] selectStrs = new String[users.length + 1];
 
         //添加自己的用户名 ID
-        selectStrs[0] = "ID：" + LoginActivity.mUserSelfId + " 用户名：" + anyChatSDK.GetUserName(LoginActivity.mUserSelfId) + " (自己)";
+        selectStrs[0] = "ID：" + mUserSelfId + " 用户名：" + anyChatSDK.GetUserName(mUserSelfId) + " (自己)";
 
         //添加其他用户的用户名 ID
         for (int i = 0; i < users.length; i++) {
@@ -108,7 +94,7 @@ public class MoreFeatureFragment extends DialogFragment implements View.OnClickL
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
-                    anyChatSDK.SnapShot(LoginActivity.mUserSelfId, 0, 0);
+                    anyChatSDK.SnapShot(mUserSelfId, 0, 0);
                 } else {
                     anyChatSDK.SnapShot(users[which - 1], 0, 0);
                 }
@@ -117,7 +103,6 @@ public class MoreFeatureFragment extends DialogFragment implements View.OnClickL
 
         alertBuilder.show();
     }
-
 
     /**
      * 打开系统的文件选择器
@@ -169,8 +154,6 @@ public class MoreFeatureFragment extends DialogFragment implements View.OnClickL
                 chooseReceiveUser(path);
             }
         }).show();
-
-
     }
 
     /**
@@ -184,7 +167,7 @@ public class MoreFeatureFragment extends DialogFragment implements View.OnClickL
         String[] selectStrs = new String[users.length + 1];
 
         //添加自己的用户名 ID
-        selectStrs[0] = "ID：" + LoginActivity.mUserSelfId + " 用户名：" + anyChatSDK.GetUserName(LoginActivity.mUserSelfId) + " (自己)";
+        selectStrs[0] = "ID：" + mUserSelfId + " 用户名：" + anyChatSDK.GetUserName(mUserSelfId) + " (自己)";
 
         //添加其他用户的用户名 ID
         for (int i = 0; i < users.length; i++) {
@@ -207,8 +190,6 @@ public class MoreFeatureFragment extends DialogFragment implements View.OnClickL
         });
 
         alertBuilder.show();
-
-
     }
 
 }

@@ -35,7 +35,7 @@ import com.videocomm.utils.ToastUtil;
  * @function[功能简介 视频通讯界面中画面设置的DialogFragment]
  **/
 
-public class HdSettingFragment extends DialogFragment implements View.OnClickListener {
+public class HdSettingFragment extends BaseDlgFragment implements View.OnClickListener {
 
     private String[] hdSettingList = new String[]{"超清 1080P", "高清 720P", "标准 480P", "流畅 320P", "自定义画质"};
     /**
@@ -49,12 +49,11 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
     /**
      * 码率
      */
-    private final int[] mArrVideoBitrateValue = { 100 * 1000, 400 * 1000, 600 * 1000, 800 * 1000, 200 * 1000, 300 * 1000, 500 * 1000, 800 * 1000, 1000 * 1000};
+    private final int[] mArrVideoBitrateValue = {100 * 1000, 400 * 1000, 600 * 1000, 800 * 1000, 200 * 1000, 300 * 1000, 500 * 1000, 800 * 1000, 1000 * 1000};
     /**
      * 帧率
      */
     private final int[] mArrVideofpsValue = {10, 15, 20, 25};
-
 
     private String[] resolutionList = new String[]{"320 x 240", "352 x 288", "640 x 480", "720 x 480", "1280 x 720", "1920 x 1280"};
     private String[] frameList = new String[]{"5 f/s", "10 f/s", "15 f/s", "20 f/s", "25 f/s", "30 f"};
@@ -83,24 +82,13 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
 
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Window window = getDialog().getWindow();
-        View view = inflater.inflate(R.layout.dlg_hd_setting, ((ViewGroup) window.findViewById(android.R.id.content)), false);//需要用android.R.id.content这个view
-        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));//注意此处
-        window.setGravity(Gravity.BOTTOM);
-        window.setLayout(-1, -2);//这2行,和上面的一样,注意顺序就行
-        WindowManager.LayoutParams lp = window.getAttributes();
-        lp.windowAnimations = R.style.HdSettingAnimation;//设置DialogFragment的动画
-        window.setAttributes(lp);
-        return view;
+    protected int initLayout() {
+        return R.layout.dlg_hd_setting;
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
+    protected void initView(View view) {
         tvTitleLeft = view.findViewById(R.id.tv_title_left);
         tvDlgClose = view.findViewById(R.id.tv_dlg_close);
         line = view.findViewById(R.id.line);
@@ -169,6 +157,11 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
         initHdCustom(view);//初始化自定义画质布局
     }
 
+    /**
+     * 初始化自定义画质布局
+     *
+     * @param view
+     */
     private void initHdCustom(View view) {
         SeekBar sbResolution = view.findViewById(R.id.sb_resolution);
         SeekBar sbFrame = view.findViewById(R.id.sb_frame);
@@ -256,7 +249,7 @@ public class HdSettingFragment extends DialogFragment implements View.OnClickLis
                 llCustom.setVisibility(View.GONE);
                 break;
             case R.id.tv_dlg_close:
-                dismiss();
+                dismiss();//关闭
                 break;
             default:
                 break;

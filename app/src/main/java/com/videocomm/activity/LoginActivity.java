@@ -1,11 +1,9 @@
-package com.videocomm;
+package com.videocomm.activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -25,7 +23,7 @@ import androidx.core.app.ActivityCompat;
 import com.bairuitech.anychat.AnyChatBaseEvent;
 import com.bairuitech.anychat.AnyChatCoreSDK;
 import com.bairuitech.anychat.AnyChatDefine;
-import com.videocomm.bean.UserBean;
+import com.videocomm.R;
 import com.videocomm.utils.PermissionUtil;
 import com.videocomm.utils.SpUtil;
 import com.videocomm.utils.ToastUtil;
@@ -41,25 +39,29 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  * @function[功能简介 登陆功能Actvity]
  **/
 
-public class LoginActivity extends AbsActivity implements View.OnClickListener, AnyChatBaseEvent {
+public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
     /**
      * app需要用到的动态添加权限 6.0以上才会去申请
      */
     String[] permissions = new String[]{Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+
     /**
      * 用户名
      */
     private EditText etUser;
+
     /**
      * 房间号
      */
     private EditText etRoom;
+
     /**
      * app的版本号
      */
     private TextView tvAppVersion;
+
     /**
      * 加入按钮
      */
@@ -69,23 +71,28 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
      * 用户名
      */
     private String mUsername;
+
     /**
      * 房间名
      */
     private String mRoom;
-    /**
-     * 自己的用户id
-     */
-    public static int mUserSelfId;
 
+    /**
+     * VideoActivity退出的请求码
+     */
     private static final int VIDEOACTIVITY_EXIT_CODE = 10000;
 
-    public AnyChatCoreSDK anyChatSDK;
-    private final int LOCALVIDEOAUTOROTATION = 1; // 本地视频自动旋转控制
-    private String tag = this.getClass().getSimpleName();
-    private List<UserBean> mUserBeanList = new ArrayList<>();
-    private ProgressDialog mDialog;
+    /**
+     * 本地视频自动旋转控制
+     */
+    private final int LOCALVIDEOAUTOROTATION = 1;
 
+    /**
+     * 类名
+     */
+    private String tag = this.getClass().getSimpleName();
+
+    private ProgressDialog mDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -95,15 +102,14 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
         InitSDK();
     }
 
+    /**
+     * 初始化SDK
+     */
     private void InitSDK() {
-        if (anyChatSDK == null) {
-            anyChatSDK = AnyChatCoreSDK.getInstance(this);
-            anyChatSDK.SetBaseEvent(this);
-            anyChatSDK.InitSDK(android.os.Build.VERSION.SDK_INT, 0);
-            AnyChatCoreSDK.SetSDKOptionInt(
-                    AnyChatDefine.BRAC_SO_LOCALVIDEO_AUTOROTATION,
-                    LOCALVIDEOAUTOROTATION);
-        }
+        mAnyChatSDK.InitSDK(android.os.Build.VERSION.SDK_INT, 0);
+        AnyChatCoreSDK.SetSDKOptionInt(
+                AnyChatDefine.BRAC_SO_LOCALVIDEO_AUTOROTATION,
+                LOCALVIDEOAUTOROTATION);
     }
 
     /**
@@ -126,7 +132,6 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
         //初始化用户名 房间号
         etUser.setText(mUsername);
         etRoom.setText(mRoom);
-
     }
 
     @Override
@@ -139,40 +144,39 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
                 SpUtil.getInstance().saveUserName(etUser.getText().toString());
                 SpUtil.getInstance().saveRoom(etRoom.getText().toString());
 
-                //检查输入文本
-                checkText();
-                //请求权限
-//                requestPermission();
-
+                //检查输入文本和权限
+                checkTextAndPermission();
                 break;
             default:
                 break;
         }
     }
 
+    /**
+     * 开启登陆提示框
+     */
     private void showLoginDialog() {
         if (mDialog == null) {
             mDialog = new ProgressDialog(this);
             mDialog.setMessage("登录中，请等待");
             mDialog.setCancelable(false);
-            mDialog.show();
-        } else {
-            mDialog.show();
         }
-
+        mDialog.show();
     }
 
+    /**
+     * 开始连接登陆SDK
+     */
     private void startLoginSDK() {
         AnyChatCoreSDK.SetSDKOptionString(AnyChatDefine.BRAC_SO_CLOUD_APPGUID, "fbe957d1-c25a-4992-9e75-d993294a5d56");
-        anyChatSDK.Connect("cloud.anychat.cn", 8906);
-        anyChatSDK.Login(etUser.getText().toString(), "");
-
+        mAnyChatSDK.Connect("cloud.anychat.cn", 8906);
+        mAnyChatSDK.Login(etUser.getText().toString(), "");
     }
 
     /**
      * 检查输入的格式是否正确 请求权限
      */
-    private void checkText() {
+    private void checkTextAndPermission() {
         if (TextUtils.isEmpty(etUser.getText().toString())) {
             ToastUtil.show(getString(R.string.empty_user));
             return;
@@ -181,7 +185,6 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
             ToastUtil.show(getString(R.string.empty_room));
             return;
         }
-
         //请求权限 同意才能下一步
         if (PermissionUtil.checkPermission(LoginActivity.this, permissions)) {
             //展示dialog
@@ -189,8 +192,6 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
             //开始登录SDK
             startLoginSDK();
         }
-
-
     }
 
     /**
@@ -215,6 +216,7 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
             startLoginSDK();
 
         } else {
+            //某个权限拒绝
             for (int i = 0; i < permissions.length; i++) {
                 Log.i("onRequestPermission", "授权的权限: " + permissions[i]);
                 Log.i("onRequestPermission", "授权的结果: " + grantResults[i]);
@@ -223,11 +225,7 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
                     showWaringDialog();
                 }
             }
-
-
         }
-
-
     }
 
     /**
@@ -249,6 +247,9 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
                 }).show();
     }
 
+    /**
+     * 启动VideoActivity
+     */
     private void startVideoActvity() {
 
         //启动视频通话
@@ -260,26 +261,14 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-
             case VIDEOACTIVITY_EXIT_CODE:
                 //VideoActivity退出后 要重新设置事件 不然收不到消息
-                anyChatSDK.removeEvent(this);
-                anyChatSDK.SetBaseEvent(this);
+                mAnyChatSDK.removeEvent(this);
+                mAnyChatSDK.SetBaseEvent(this);
                 break;
             default:
                 break;
-
         }
-
-    }
-
-    @Override
-    public void OnAnyChatConnectMessage(boolean bSuccess) {
-        if (!bSuccess) {
-            ToastUtil.show("连接服务器失败，自动重连，请稍后...");
-            System.out.println("connect failed");
-        }
-
     }
 
     @Override
@@ -288,25 +277,16 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
         if (dwErrorCode == 0) {
             int sHourseID = Integer.valueOf(etRoom.getEditableText()
                     .toString());
-            anyChatSDK.EnterRoom(sHourseID, "");//进入房间
-            mUserSelfId = dwUserId;
+            mAnyChatSDK.EnterRoom(sHourseID, "");//进入房间
         } else {
             ToastUtil.show("登陆失败");
         }
-
-    }
-
-    @Override
-    public void OnAnyChatEnterRoomMessage(int dwRoomId, int dwErrorCode) {
-        Log.i(tag, "OnAnyChatEnterRoomMessage" + dwRoomId + "err:"
-                + dwErrorCode);
     }
 
     @Override
     public void OnAnyChatOnlineUserMessage(int dwUserNum, int dwRoomId) {
         Log.i(tag, "房间在线用户消息 dwUserNum表示在线用户数（包含自己）:" + dwUserNum + "-dwRoomId表示房间ID:" + dwRoomId);
 
-        updateUserList();
         //关闭Dialog
         if (mDialog != null) {
             mDialog.dismiss();
@@ -315,77 +295,10 @@ public class LoginActivity extends AbsActivity implements View.OnClickListener, 
         startVideoActvity();
     }
 
-    private void updateUserList() {
-        mUserBeanList.clear();
-        //添加自己的参数
-        UserBean userSelfBean = new UserBean();
-        userSelfBean.setUserId(mUserSelfId);
-        userSelfBean.setUserName(etUser.getText().toString());
-        mUserBeanList.add(userSelfBean);
-
-        //添加其他用户的参数
-        int[] userID = anyChatSDK.GetOnlineUser();//获取在线的用户id
-        for (int index = 0; index < userID.length; ++index) {
-            Log.i(tag, "打印房间其他的用户id" + userID[index]);
-            Log.i(tag, "打印房间其他的用户名" + anyChatSDK.GetUserName(userID[index]));
-
-            UserBean info = new UserBean();
-            info.setUserName(anyChatSDK.GetUserName(userID[index]));
-            info.setUserId(userID[index]);
-            mUserBeanList.add(info);
-        }
-    }
-
-    /**
-     * 用户进入/退出房间消息，dwUserId表示用户ID号，bEnter表示该用户是进入（TRUE）或离开（FALSE）房间
-     * <p>
-     * 进来会先触发一次
-     *
-     * @param dwUserId
-     * @param bEnter
-     */
-    @Override
-    public void OnAnyChatUserAtRoomMessage(int dwUserId, boolean bEnter) {
-        if (bEnter) {
-            Log.i(tag, "用户进入 打印房间其他的用户id" + anyChatSDK.GetUserName(dwUserId));
-            Log.i(tag, "用户进入 打印房间其他的用户名" + dwUserId);
-            //用户进入
-            UserBean info = new UserBean();
-            info.setUserId(dwUserId);
-            info.setUserName(anyChatSDK.GetUserName(dwUserId));
-            mUserBeanList.add(info);
-        } else {
-            //用户退出
-            Log.i(tag, "用户退出 打印房间其他的用户id" + anyChatSDK.GetUserName(dwUserId));
-            Log.i(tag, "用户退出 打印房间其他的用户名" + dwUserId);
-            for (int i = 0; i < mUserBeanList.size(); i++) {
-                if (mUserBeanList.get(i).getUserId() == dwUserId) {
-                    mUserBeanList.remove(i);
-                }
-            }
-        }
-
-        for (UserBean bean : mUserBeanList) {
-            Log.i(tag, "检查用户进入退出 列表数据是否改变" + bean.getUserId());
-            Log.i(tag, "检查用户进入退出 列表数据是否改变" + bean.getUserName());
-
-        }
-    }
-
-    /**
-     * 网络断开消息，该消息只有在客户端连接服务器成功之后，网络异常中断之时触发，dwErrorCode表示连接断开的原因
-     *
-     * @param dwErrorCode
-     */
-    @Override
-    public void OnAnyChatLinkCloseMessage(int dwErrorCode) {
-
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        anyChatSDK.removeEvent(this);
-        anyChatSDK.Release();
+        mAnyChatSDK.removeEvent(this);
+        mAnyChatSDK.Release();
     }
 }

@@ -7,8 +7,6 @@ import android.os.Build;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.videocomm.LoginActivity;
-
 /**
  * @author[wengCJ]
  * @version[创建日期，2019/12/27 0027]
