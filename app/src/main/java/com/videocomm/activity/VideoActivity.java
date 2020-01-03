@@ -14,11 +14,9 @@ import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.Group;
 
 import com.bairuitech.anychat.AnyChatBaseEvent;
 import com.bairuitech.anychat.AnyChatCoreSDK;
@@ -39,7 +37,7 @@ import java.lang.ref.WeakReference;
  * @function[功能简介 视频通讯的Acitivity]
  **/
 
-public class VideoActivity extends BaseActivity implements View.OnClickListener, AnyChatBaseEvent, AnyChatRecordEvent, AnyChatTransDataEvent {
+public class VideoActivity extends EventActivity implements View.OnClickListener, AnyChatBaseEvent, AnyChatRecordEvent, AnyChatTransDataEvent {
 
     private static final String tagSdk = "VCommSdk";
 
@@ -654,7 +652,7 @@ public class VideoActivity extends BaseActivity implements View.OnClickListener,
                     Log.i(tag,"切换视频 移除视频");
                     switchVideo((SurfaceView) llVideoControl.getChildAt(0),0);
                 }
-                llVideoControl.removeViewAt(userList.indexOfValue(Math.abs(dwUserId)));//根据退出的用户id查出索引移除view
+                llVideoControl.removeViewAt(userList.indexOfValue(Math.abs(dwUserId)));//根据退出的用户id 查出索引移除view
                 userList.removeAt(userList.indexOfValue(Math.abs(dwUserId)));//移除索引对应的数值
 
             }

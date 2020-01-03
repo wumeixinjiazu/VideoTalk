@@ -40,6 +40,7 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+        //这里不需要 移除回调事件
         initTitle();//初始化标题栏
         initView();
     }
@@ -89,7 +90,6 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
                 break;
             default:
                 break;
-
         }
     }
 

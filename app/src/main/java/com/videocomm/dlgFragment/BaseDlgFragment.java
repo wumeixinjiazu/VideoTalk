@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.squareup.leakcanary.RefWatcher;
+import com.videocomm.MyApplication;
 import com.videocomm.R;
 
 /**
@@ -57,5 +59,13 @@ public abstract class BaseDlgFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //检测内存泄露
+        RefWatcher refWatcher = MyApplication.getRefWatcher(getContext());
+        refWatcher.watch(this);
     }
 }

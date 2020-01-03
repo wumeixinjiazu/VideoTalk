@@ -20,16 +20,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
-import com.bairuitech.anychat.AnyChatBaseEvent;
 import com.bairuitech.anychat.AnyChatCoreSDK;
 import com.bairuitech.anychat.AnyChatDefine;
 import com.videocomm.R;
 import com.videocomm.utils.PermissionUtil;
 import com.videocomm.utils.SpUtil;
 import com.videocomm.utils.ToastUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -39,7 +35,7 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  * @function[功能简介 登陆功能Actvity]
  **/
 
-public class LoginActivity extends BaseActivity implements View.OnClickListener {
+public class LoginActivity extends EventActivity implements View.OnClickListener {
 
     /**
      * app需要用到的动态添加权限 6.0以上才会去申请
