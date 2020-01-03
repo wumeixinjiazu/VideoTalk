@@ -14,6 +14,7 @@ import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -39,16 +40,29 @@ import java.lang.ref.WeakReference;
 
 public class VideoActivity extends EventActivity implements View.OnClickListener, AnyChatBaseEvent, AnyChatRecordEvent, AnyChatTransDataEvent {
 
-    private static final String tagSdk = "VCommSdk";
-
+    /**
+     * 类名
+     */
     private String tag = this.getClass().getSimpleName();
 
-    private SurfaceView mSurfaceLocal;
+    /**
+     * 大视频SurfaceView
+     */
+    private SurfaceView mSurfaceBig;
 
-    private LinearLayout llVideoControl;
+    /**
+     * 小视频的布局上层
+     */
+    private LinearLayout llSmartVideo;
 
+    /**
+     * 没有人时展示的Dialog
+     */
     private ProgressDialog mDialog;
 
+    /**
+     * 录制功能按钮
+     */
     private ImageButton ibRecord;
 
     /**
@@ -81,13 +95,17 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
      */
     private boolean isRecordState = false;
 
-    private VideoHandler mHandler = new VideoHandler(this);
-
+    /**
+     * 视频界面全布局
+     */
     private ConstraintLayout mVideoMainLayout;
+
     /**
      * 视频界面所有的功能按钮
      */
     private LinearLayout mLlControl;
+
+    private VideoHandler mHandler = new VideoHandler(this);
 
     static class VideoHandler extends Handler {
         WeakReference<Activity> refActivity;
@@ -161,7 +179,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
         // 如果是采用Java视频采集，则需要设置Surface的CallBack
         if (AnyChatCoreSDK
                 .GetSDKOptionInt(AnyChatDefine.BRAC_SO_LOCALVIDEO_CAPDRIVER) == AnyChatDefine.VIDEOCAP_DRIVER_JAVA) {
-            mSurfaceLocal.getHolder().addCallback(AnyChatCoreSDK.mCameraHelper);
+            mSurfaceBig.getHolder().addCallback(AnyChatCoreSDK.mCameraHelper);
         }
 
         mAnyChatSDK.UserCameraControl(-1, 1);// -1表示对本地视频进行控制，打开本地视频
@@ -204,19 +222,19 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
      * 初始化布局
      */
     private void initView() {
-        mSurfaceLocal = findViewById(R.id.surface_local);
+        mSurfaceBig = findViewById(R.id.surface_big);
         ImageButton ibCameraReset = findViewById(R.id.ib_camera_reset);
         ImageButton ibHangUp = findViewById(R.id.ib_hang_up);
         ImageButton ibHdSetting = findViewById(R.id.ib_hd_setting);
         ImageButton ibMore = findViewById(R.id.ib_more);
         ibRecord = findViewById(R.id.ib_record);
-        llVideoControl = findViewById(R.id.ll_video_control);
+        llSmartVideo = findViewById(R.id.ll_smart_video);
         ivRecordState = findViewById(R.id.iv_record_state);
         chronometer = findViewById(R.id.chronometer);
         mVideoMainLayout = findViewById(R.id.video_main);
         mLlControl = findViewById(R.id.ll_control);
 
-        mSurfaceLocal.setTag(mUserSelfId);
+        mSurfaceBig.setTag(mUserSelfId);
 
         ibCameraReset.setOnClickListener(this);
         ibHangUp.setOnClickListener(this);
@@ -235,24 +253,24 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
         int heigth = DisplayUtil.getScreenHeight() / 3;
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, heigth);
         lp.rightMargin = DisplayUtil.dp2px(10);
-        SurfaceView mSurfaceRemote = new SurfaceView(VideoActivity.this);
+        SurfaceView mSurfaceSmart = new SurfaceView(VideoActivity.this);
         // 如果是采用Java视频显示，则需要设置Surface的CallBack
         if (AnyChatCoreSDK
                 .GetSDKOptionInt(AnyChatDefine.BRAC_SO_VIDEOSHOW_DRIVERCTRL) == AnyChatDefine.VIDEOSHOW_DRIVER_JAVA) {
-            int index = mAnyChatSDK.mVideoHelper.bindVideo(mSurfaceRemote
+            int index = mAnyChatSDK.mVideoHelper.bindVideo(mSurfaceSmart
                     .getHolder());
             mAnyChatSDK.mVideoHelper.SetVideoUser(index, userId);
         }
 
-        mSurfaceRemote.setTag(userId);//记录视频的用户id
+        mSurfaceSmart.setTag(userId);//记录视频的用户id
 
-        mSurfaceRemote.setOnClickListener(this);
-        mSurfaceRemote.setZOrderOnTop(true);
+        mSurfaceSmart.setOnClickListener(this);
+        mSurfaceSmart.setZOrderOnTop(true);
 
         mAnyChatSDK.UserCameraControl(userId, 1);//打开对方视频进行控制，打开本地视频
         mAnyChatSDK.UserSpeakControl(userId, 1);//打开对方音频进行控制，打开本地视频
 
-        llVideoControl.addView(mSurfaceRemote, lp);
+        llSmartVideo.addView(mSurfaceSmart, lp);
 
     }
 
@@ -291,14 +309,13 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
                 } else {
                     stopRecord();//停止录像
                 }
-
                 break;
             case R.id.ib_more://更多功能
-                new MoreFeatureFragment(mAnyChatSDK,mUserSelfId).show(getSupportFragmentManager(), "MoreFeatureFragment");
+                new MoreFeatureFragment(mAnyChatSDK, mUserSelfId).show(getSupportFragmentManager(), "MoreFeatureFragment");
                 break;
             default:
                 for (int i = 0; i < userList.size(); i++) {
-                    SurfaceView clickSmartView = (SurfaceView) llVideoControl.getChildAt(i);
+                    SurfaceView clickSmartView = (SurfaceView) llSmartVideo.getChildAt(i);
                     //获取被点击的视频判断是否与小视频控件一样
                     if (v == clickSmartView) {
                         switchVideo(clickSmartView, i);
@@ -310,7 +327,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
 
     /**
      * 大小视频切换 （主要是把之前绑定的控件SurfaceView移除掉，然后重新设置渲染）
-     *
+     * <p>
      * note: 视频切换后，会把所有的控件给覆盖。 现在的方法是，把原有界面上的控件给移除再重新添加进去
      * <p>
      * 一开始大视频都是播放自己的画面 小视频都是其他用户的画面
@@ -322,11 +339,11 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
 
         ToastUtil.show("点中了第" + position + "个");
 
-        //获取保存在 clickSmartView 中记录的参数
+        //获取保存在 clickSmartView 中记录的参数 curSmartUserId 控件所对应的用户ID
         int curSmartUserId = (int) clickSmartView.getTag();
 
-        //获取保存在 mSurfaceLocal 中记录的参数
-        int curBigUserId = (int) mSurfaceLocal.getTag();
+        //获取保存在 mSurfaceBig 中记录的参数 curBigUserId 控件所对应的用户ID
+        int curBigUserId = (int) mSurfaceBig.getTag();
 
         //停止自己的音视频的传输
         mAnyChatSDK.UserCameraControl(-1, 0);
@@ -337,11 +354,11 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
         mAnyChatSDK.UserSpeakControl(curSmartUserId, 0);
 
         //移除控件
-        llVideoControl.removeView(clickSmartView);
-        mVideoMainLayout.removeView(mSurfaceLocal);
+        llSmartVideo.removeView(clickSmartView);
+        mVideoMainLayout.removeView(mSurfaceBig);
 
         //创建控件
-        mSurfaceLocal = new SurfaceView(VideoActivity.this);
+        mSurfaceBig = new SurfaceView(VideoActivity.this);
         clickSmartView = new SurfaceView(VideoActivity.this);
 
         //设置监听
@@ -353,7 +370,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
             // 如果是采用Java视频采集，则需要设置Surface的CallBack
             if (AnyChatCoreSDK
                     .GetSDKOptionInt(AnyChatDefine.BRAC_SO_LOCALVIDEO_CAPDRIVER) == AnyChatDefine.VIDEOCAP_DRIVER_JAVA) {
-                mSurfaceLocal.getHolder().addCallback(AnyChatCoreSDK.mCameraHelper);
+                mSurfaceBig.getHolder().addCallback(AnyChatCoreSDK.mCameraHelper);
             }
 
             // 如果是采用Java视频显示，则需要设置Surface的CallBack
@@ -368,7 +385,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
             clickSmartView.setTag(curBigUserId);
 
             //改变当前大视频视图的参数
-            mSurfaceLocal.setTag(mUserSelfId);
+            mSurfaceBig.setTag(mUserSelfId);
 
             //开启自己的音视频的传输
             mAnyChatSDK.UserCameraControl(-1, 1);
@@ -396,7 +413,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
                 // 如果是采用Java视频显示，则需要设置Surface的CallBack 其他用户都是设置这个
                 if (AnyChatCoreSDK
                         .GetSDKOptionInt(AnyChatDefine.BRAC_SO_VIDEOSHOW_DRIVERCTRL) == AnyChatDefine.VIDEOSHOW_DRIVER_JAVA) {
-                    int index = mAnyChatSDK.mVideoHelper.bindVideo(mSurfaceLocal
+                    int index = mAnyChatSDK.mVideoHelper.bindVideo(mSurfaceBig
                             .getHolder());
                     mAnyChatSDK.mVideoHelper.SetVideoUser(index, curSmartUserId);
                 }
@@ -405,7 +422,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
                 clickSmartView.setTag(mUserSelfId);
 
                 //改变当前大视频视图的参数
-                mSurfaceLocal.setTag(curSmartUserId);
+                mSurfaceBig.setTag(curSmartUserId);
 
                 //开启自己的音视频的传输
                 mAnyChatSDK.UserCameraControl(-1, 1);
@@ -427,7 +444,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
                 // 如果是采用Java视频显示，则需要设置Surface的CallBack 其他用户都是设置这个
                 if (AnyChatCoreSDK
                         .GetSDKOptionInt(AnyChatDefine.BRAC_SO_VIDEOSHOW_DRIVERCTRL) == AnyChatDefine.VIDEOSHOW_DRIVER_JAVA) {
-                    int index = mAnyChatSDK.mVideoHelper.bindVideo(mSurfaceLocal
+                    int index = mAnyChatSDK.mVideoHelper.bindVideo(mSurfaceBig
                             .getHolder());
                     mAnyChatSDK.mVideoHelper.SetVideoUser(index, curSmartUserId);
                 }
@@ -436,7 +453,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
                 clickSmartView.setTag(curBigUserId);
 
                 //改变当前大视频视图的参数
-                mSurfaceLocal.setTag(curSmartUserId);
+                mSurfaceBig.setTag(curSmartUserId);
 
                 //开启凯队的音视频的传输
                 mAnyChatSDK.UserCameraControl(curBigUserId, 1);
@@ -448,7 +465,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
             }
         }
         //设置SurfaceLocal控件是不是置于最上面
-        mSurfaceLocal.setZOrderOnTop(false);
+        mSurfaceBig.setZOrderOnTop(false);
         clickSmartView.setZOrderOnTop(true);
 
         //获取系统的宽高设置给小视频的宽高
@@ -457,11 +474,10 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, heigth);
         lp.rightMargin = DisplayUtil.dp2px(10);
 
-        ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
         //添加大视频
-        mVideoMainLayout.addView(mSurfaceLocal, layoutParams);
+        mVideoMainLayout.addView(mSurfaceBig, new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT));
         //添加小视频
-        llVideoControl.addView(clickSmartView, position, lp);
+        llSmartVideo.addView(clickSmartView, position, lp);
 
         //移除视频界面的全部功能按钮
         mVideoMainLayout.removeView(mLlControl);
@@ -483,7 +499,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
         ivRecordStateParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
         ivRecordStateParams.topMargin = DisplayUtil.dp2px(10);
         ivRecordStateParams.leftMargin = DisplayUtil.dp2px(10);
-        mVideoMainLayout.addView(ivRecordState,ivRecordStateParams);
+        mVideoMainLayout.addView(ivRecordState, ivRecordStateParams);
 
         ConstraintLayout.LayoutParams chronometerParams = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
         chronometerParams.leftMargin = DisplayUtil.dp2px(10);
@@ -552,7 +568,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
             mAnyChatSDK.UserSpeakControl(mOnlineUser[i], 1);
 
             // 如果是采用Java视频显示，则需要设置Surface的CallBack
-            SurfaceView surfaceViewRemote = (SurfaceView) llVideoControl.getChildAt(i);
+            SurfaceView surfaceViewRemote = (SurfaceView) llSmartVideo.getChildAt(i);
             if (AnyChatCoreSDK
                     .GetSDKOptionInt(AnyChatDefine.BRAC_SO_VIDEOSHOW_DRIVERCTRL) == AnyChatDefine.VIDEOSHOW_DRIVER_JAVA) {
                 int index = mAnyChatSDK.mVideoHelper.bindVideo(surfaceViewRemote
@@ -586,7 +602,7 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
     protected void onDestroy() {
         super.onDestroy();
         Log.i(tag, "onDestroy");
-        llVideoControl.removeAllViews();
+        llSmartVideo.removeAllViews();
         mAnyChatSDK.UserCameraControl(-1, 0);// -1表示对本地视频进行控制，关闭本地视频
         mAnyChatSDK.UserSpeakControl(-1, 0);// -1表示对本地音频进行控制，关闭本地音频
         mAnyChatSDK.removeEvent(this);
@@ -646,13 +662,13 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
                 // 移除小视频时要多加一个判断
                 // 如果这时小视频是自己的画面 && 当前小视频个数只有一个
                 // 需要先把小视频与大视频切换 然后再移除小视频
-                Log.i(tag,"打印现在小视频的个数"+llVideoControl.getChildCount());
-                Log.i(tag,"打印现在小视频的用户"+llVideoControl.getChildAt(0).getTag());
-                if (llVideoControl.getChildCount() == 1 && llVideoControl.getChildAt(0).getTag().equals(mUserSelfId)){
-                    Log.i(tag,"切换视频 移除视频");
-                    switchVideo((SurfaceView) llVideoControl.getChildAt(0),0);
+                Log.i(tag, "打印现在小视频的个数" + llSmartVideo.getChildCount());
+                Log.i(tag, "打印现在小视频的用户" + llSmartVideo.getChildAt(0).getTag());
+                if (llSmartVideo.getChildCount() == 1 && llSmartVideo.getChildAt(0).getTag().equals(mUserSelfId)) {
+                    Log.i(tag, "切换视频 移除视频");
+                    switchVideo((SurfaceView) llSmartVideo.getChildAt(0), 0);
                 }
-                llVideoControl.removeViewAt(userList.indexOfValue(Math.abs(dwUserId)));//根据退出的用户id 查出索引移除view
+                llSmartVideo.removeViewAt(userList.indexOfValue(Math.abs(dwUserId)));//根据退出的用户id 查出索引移除view
                 userList.removeAt(userList.indexOfValue(Math.abs(dwUserId)));//移除索引对应的数值
 
             }
@@ -740,5 +756,6 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
     public void OnAnyChatSDKFilterData(byte[] lpBuf, int dwLen) {
 
     }
+
 }
 

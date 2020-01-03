@@ -115,7 +115,6 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
         SpUtil.getInstance().saveServerAddr(serverAddress);
         SpUtil.getInstance().saveServerPort(serverPort);
 
-
         ToastUtil.show("保存成功");
     }
 }

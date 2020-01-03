@@ -88,6 +88,9 @@ public class LoginActivity extends EventActivity implements View.OnClickListener
      */
     private String tag = this.getClass().getSimpleName();
 
+    /**
+     * 登陆的Dialog
+     */
     private ProgressDialog mDialog;
 
     @Override
