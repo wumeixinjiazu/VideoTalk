@@ -14,6 +14,7 @@ import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -52,6 +53,9 @@ public class VideoActivity extends BaseActivity implements View.OnClickListener,
 
     private ImageButton ibRecord;
 
+    /**
+     * 视频录制图片
+     */
     private ImageView ivRecordState;
 
     /**
@@ -80,6 +84,7 @@ public class VideoActivity extends BaseActivity implements View.OnClickListener,
     private boolean isRecordState = false;
 
     private VideoHandler mHandler = new VideoHandler(this);
+
     private ConstraintLayout mVideoMainLayout;
     /**
      * 视频界面所有的功能按钮
@@ -307,6 +312,8 @@ public class VideoActivity extends BaseActivity implements View.OnClickListener,
 
     /**
      * 大小视频切换 （主要是把之前绑定的控件SurfaceView移除掉，然后重新设置渲染）
+     *
+     * note: 视频切换后，会把所有的控件给覆盖。 现在的方法是，把原有界面上的控件给移除再重新添加进去
      * <p>
      * 一开始大视频都是播放自己的画面 小视频都是其他用户的画面
      *
@@ -460,12 +467,33 @@ public class VideoActivity extends BaseActivity implements View.OnClickListener,
 
         //移除视频界面的全部功能按钮
         mVideoMainLayout.removeView(mLlControl);
+        //移除视频界面的录制效果图
+        mVideoMainLayout.removeView(ivRecordState);
+        //移除视频界面的录制计时器
+        mVideoMainLayout.removeView(chronometer);
+
+        //重新用代码写入被移除的控件
         ConstraintLayout.LayoutParams llControlParams = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
         llControlParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
         llControlParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
         llControlParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
         llControlParams.bottomMargin = DisplayUtil.dp2px(50);
         mVideoMainLayout.addView(mLlControl, llControlParams);
+
+        ConstraintLayout.LayoutParams ivRecordStateParams = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        ivRecordStateParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+        ivRecordStateParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        ivRecordStateParams.topMargin = DisplayUtil.dp2px(10);
+        ivRecordStateParams.leftMargin = DisplayUtil.dp2px(10);
+        mVideoMainLayout.addView(ivRecordState,ivRecordStateParams);
+
+        ConstraintLayout.LayoutParams chronometerParams = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        chronometerParams.leftMargin = DisplayUtil.dp2px(10);
+        chronometerParams.topMargin = DisplayUtil.dp2px(10);
+        chronometerParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        chronometerParams.bottomToBottom = ivRecordState.getId();
+        chronometerParams.startToEnd = ivRecordState.getId();
+        mVideoMainLayout.addView(chronometer, chronometerParams);
     }
 
     /**
@@ -617,6 +645,15 @@ public class VideoActivity extends BaseActivity implements View.OnClickListener,
                 Log.i(tag, "退出一个用户 ID索引" + userList.indexOfValue(Math.abs(dwUserId)));
                 Log.i(tag, "退出一个用户 用户名为" + mAnyChatSDK.GetUserName(dwUserId));
 
+                // 移除小视频时要多加一个判断
+                // 如果这时小视频是自己的画面 && 当前小视频个数只有一个
+                // 需要先把小视频与大视频切换 然后再移除小视频
+                Log.i(tag,"打印现在小视频的个数"+llVideoControl.getChildCount());
+                Log.i(tag,"打印现在小视频的用户"+llVideoControl.getChildAt(0).getTag());
+                if (llVideoControl.getChildCount() == 1 && llVideoControl.getChildAt(0).getTag().equals(mUserSelfId)){
+                    Log.i(tag,"切换视频 移除视频");
+                    switchVideo((SurfaceView) llVideoControl.getChildAt(0),0);
+                }
                 llVideoControl.removeViewAt(userList.indexOfValue(Math.abs(dwUserId)));//根据退出的用户id查出索引移除view
                 userList.removeAt(userList.indexOfValue(Math.abs(dwUserId)));//移除索引对应的数值
 
@@ -643,9 +680,9 @@ public class VideoActivity extends BaseActivity implements View.OnClickListener,
         Log.i(tag, "录像时长，单位：秒" + dwElapse);
         Log.i(tag, "录像标志" + dwFlags);
         Log.i(tag, "用户自定义参数，整型" + dwParam);
-        ;
+
         Log.i(tag, "用户自定义参数，字符串类型" + lpUserStr);
-        ;
+
         ToastUtil.show("录制结束，文件保存在" + lpFileName);
     }
 

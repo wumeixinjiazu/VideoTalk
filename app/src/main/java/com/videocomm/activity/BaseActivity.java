@@ -32,7 +32,6 @@ public class BaseActivity extends AppCompatActivity implements AnyChatBaseEvent 
         super.onCreate(savedInstanceState);
         initStatus();
         InitSDK();
-        ToastUtil.show("BaseActivity onCreate");
 
     }
 
