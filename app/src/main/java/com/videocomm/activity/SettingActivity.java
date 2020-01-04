@@ -48,7 +48,10 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
     private void initTitle() {
         TextView tvTitleTitle = findViewById(R.id.tv_title_title);
         TextView tvTitleLeft = findViewById(R.id.tv_title_left);
+        TextView tvTitleRight = findViewById(R.id.tv_title_right);
+        tvTitleRight.setText(getString(R.string.save_setting));
         tvTitleTitle.setText(getString(R.string.login_setting));
+        tvTitleRight.setOnClickListener(this);
         tvTitleLeft.setOnClickListener(this);
 
     }
@@ -68,10 +71,9 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
         Spinner spinnerRecordType = findViewById(R.id.spinner_record_type);
         Spinner spinnerRecordObject = findViewById(R.id.spinner_record_object);
         Spinner spinnerRecordMode = findViewById(R.id.spinner_record_mode);
-        Spinner spinnerRecordUser = findViewById(R.id.spinner_record_user);
 
-        Button btnSaveSetting = findViewById(R.id.btn_save_setting);
-        btnSaveSetting.setOnClickListener(this);
+        Button btnUploadLog = findViewById(R.id.btn_upload_log);
+        btnUploadLog.setOnClickListener(this);
 
         //初始化数值
         etAppId.setText((mAppid.length() > 0) ? mAppid : getString(R.string.default_appid));
@@ -85,8 +87,11 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
             case R.id.tv_title_left://返回
                 finish();
                 break;
-            case R.id.btn_save_setting://保存设置
+            case R.id.tv_title_right://保存设置
                 checkAndSaveText();
+                break;
+            case R.id.btn_upload_log://上传日志
+
                 break;
             default:
                 break;
@@ -94,9 +99,9 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
     }
 
     private void checkAndSaveText() {
-        String appId = etAppId.getText().toString();
-        String serverAddress = etServerAddress.getText().toString();
-        String serverPort = etServerPort.getText().toString();
+        String appId = etAppId.getText().toString().trim();
+        String serverAddress = etServerAddress.getText().toString().trim();
+        String serverPort = etServerPort.getText().toString().trim();
 
         if (TextUtils.isEmpty(appId)) {
             ToastUtil.show(getString(R.string.tip_appid_not_null));

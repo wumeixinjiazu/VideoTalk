@@ -23,6 +23,7 @@ import androidx.core.app.ActivityCompat;
 import com.bairuitech.anychat.AnyChatCoreSDK;
 import com.bairuitech.anychat.AnyChatDefine;
 import com.videocomm.R;
+import com.videocomm.utils.AppUtil;
 import com.videocomm.utils.PermissionUtil;
 import com.videocomm.utils.SpUtil;
 import com.videocomm.utils.ToastUtil;
@@ -92,6 +93,9 @@ public class LoginActivity extends EventActivity implements View.OnClickListener
      * 登陆的Dialog
      */
     private ProgressDialog mDialog;
+    private String mAppid;
+    private String mServerAddr;
+    private String mServerPort;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -115,7 +119,7 @@ public class LoginActivity extends EventActivity implements View.OnClickListener
      * 初始化布局
      */
     private void initView() {
-        //获取上次保存的用户名房间号
+        //获取上次保存的用户名、房间号
         mUsername = SpUtil.getInstance().getUsername();
         mRoom = SpUtil.getInstance().getRoom();
 
@@ -131,6 +135,9 @@ public class LoginActivity extends EventActivity implements View.OnClickListener
         //初始化用户名 房间号
         etUser.setText(mUsername);
         etRoom.setText(mRoom);
+
+        //设置版本号
+        tvAppVersion.setText("V"+AppUtil.getVersionName(this));
     }
 
     @Override
@@ -158,7 +165,7 @@ public class LoginActivity extends EventActivity implements View.OnClickListener
         if (mDialog == null) {
             mDialog = new ProgressDialog(this);
             mDialog.setMessage("登录中，请等待");
-            mDialog.setCancelable(false);
+            mDialog.setCancelable(true);//设置可不可以取消Dialog
         }
         mDialog.show();
     }
@@ -167,8 +174,18 @@ public class LoginActivity extends EventActivity implements View.OnClickListener
      * 开始连接登陆SDK
      */
     private void startLoginSDK() {
-        AnyChatCoreSDK.SetSDKOptionString(AnyChatDefine.BRAC_SO_CLOUD_APPGUID, "fbe957d1-c25a-4992-9e75-d993294a5d56");
-        mAnyChatSDK.Connect("cloud.anychat.cn", 8906);
+        //获取数据
+        mAppid = SpUtil.getInstance().getAppid();
+        mServerAddr = SpUtil.getInstance().getServerAddr();
+        mServerPort = SpUtil.getInstance().getServerPort();
+
+        //如果值为空那就设置为默认
+        mAppid = ((mAppid.equals("")) ? getString(R.string.default_appid) : mAppid);
+        mServerAddr = ((mServerAddr.equals(""))?getString(R.string.default_server_addr):mServerAddr);
+        mServerPort = ((mServerPort.equals(""))?getString(R.string.default_server_port):mServerPort);
+
+        AnyChatCoreSDK.SetSDKOptionString(AnyChatDefine.BRAC_SO_CLOUD_APPGUID, mAppid);
+        mAnyChatSDK.Connect(mServerAddr, Integer.valueOf(mServerPort));
         mAnyChatSDK.Login(etUser.getText().toString(), "");
     }
 
@@ -184,6 +201,8 @@ public class LoginActivity extends EventActivity implements View.OnClickListener
             ToastUtil.show(getString(R.string.empty_room));
             return;
         }
+
+
         //请求权限 同意才能下一步
         if (PermissionUtil.checkPermission(LoginActivity.this, permissions)) {
             //展示dialog
@@ -272,13 +291,12 @@ public class LoginActivity extends EventActivity implements View.OnClickListener
 
     @Override
     public void OnAnyChatLoginMessage(int dwUserId, int dwErrorCode) {
+        super.OnAnyChatLoginMessage(dwUserId, dwErrorCode);
         //记录自己的userId
         if (dwErrorCode == 0) {
             int sHourseID = Integer.valueOf(etRoom.getEditableText()
                     .toString());
             mAnyChatSDK.EnterRoom(sHourseID, "");//进入房间
-        } else {
-            ToastUtil.show("登陆失败");
         }
     }
 

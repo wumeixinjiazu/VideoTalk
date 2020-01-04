@@ -1,6 +1,9 @@
 package com.videocomm.utils;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 
 /**
  * @author[wengCJ]
@@ -17,6 +20,52 @@ public class AppUtil {
 
     public static void init(Application app) {
         AppUtil.app = app;
+    }
+
+    /**
+     * 获取版本号 1
+     *
+     * @param context 上下文
+     * @return 版本号
+     */
+    public static int getVersionCode(Context context) {
+
+        //获取包管理器
+        PackageManager pm = context.getPackageManager();
+        //获取包信息
+        try {
+            PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), 0);
+            //返回版本号
+            ToastUtil.show(packageInfo.versionName + "");
+            return packageInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+
+    }
+
+    /**
+     * 获取版本名称 1.0.0
+     *
+     * @param context 上下文
+     * @return 版本名称
+     */
+    public static String getVersionName(Context context) {
+
+        //获取包管理器
+        PackageManager pm = context.getPackageManager();
+        //获取包信息
+        try {
+            PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), 0);
+            //返回版本号
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 

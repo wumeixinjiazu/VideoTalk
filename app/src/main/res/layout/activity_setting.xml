@@ -1,111 +1,176 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
 
-    <include layout="@layout/title_bar" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="@string/sdk_version" />
-
-        <TextView
-            android:id="@+id/tv_sdk_version"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/default_sdk_version" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="@string/app_id" />
-
-        <EditText
-            android:id="@+id/et_app_id"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:hint="@string/default_appid"
-            android:text="@string/default_appid" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="@string/server_addr" />
-
-        <EditText
-            android:id="@+id/et_server_address"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:hint="@string/default_server_addr"
-            android:text="@string/default_server_addr" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="@string/port" />
-
-        <EditText
-            android:id="@+id/et_server_port"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:hint="@string/default_server_port"
-            android:text="@string/default_server_port" />
-
-    </LinearLayout>
+    <include
+        android:id="@+id/title"
+        layout="@layout/title_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/tv_basic_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:padding="5dp"
+        android:text="@string/basic_info"
+        android:textSize="13dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+
+    <View
+        android:id="@+id/line1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_basic_info"
+        android:layout_marginTop="10dp"
+        android:background="#E4E4E4"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <TextView
+        android:id="@+id/tv_version_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="end"
+        android:padding="5dp"
+        android:text="@string/sdk_version"
+        app:layout_constraintEnd_toEndOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/line1" />
+
+    <TextView
+        android:id="@+id/tv_sdk_version"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:padding="5dp"
+        android:text="@string/default_sdk_version"
+        app:layout_constraintBaseline_toBaselineOf="@id/tv_version_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+
+
+    <TextView
+        android:id="@+id/tv_app_id"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="end"
+        android:padding="5dp"
+        android:text="@string/app_id"
+        app:layout_constraintEnd_toEndOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/tv_version_text" />
+
+    <EditText
+        android:id="@+id/et_app_id"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="@string/default_appid"
+        android:padding="5dp"
+        android:text="@string/default_appid"
+        android:textSize="12dp"
+        app:layout_constraintBaseline_toBaselineOf="@id/tv_app_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/tv_sdk_version" />
+
+
+    <TextView
+        android:id="@+id/tv_server_addr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="end"
+        android:padding="5dp"
+        android:text="@string/server_addr"
+        app:layout_constraintEnd_toEndOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/tv_app_id" />
+
+    <EditText
+        android:id="@+id/et_server_address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="@string/default_server_addr"
+        android:padding="5dp"
+        android:text="@string/default_server_addr"
+        android:textSize="12dp"
+        app:layout_constraintBaseline_toBaselineOf="@id/tv_server_addr"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/et_app_id" />
+
+
+    <TextView
+        android:id="@+id/tv_server_port"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="5dp"
+        android:text="@string/port"
+        app:layout_constraintEnd_toEndOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/tv_server_addr" />
+
+    <EditText
+        android:id="@+id/et_server_port"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="@string/default_server_port"
+        android:inputType="number"
+        android:padding="5dp"
+        android:text="@string/default_server_port"
+        android:textSize="12dp"
+        app:layout_constraintBaseline_toBaselineOf="@id/tv_server_port"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/et_server_address" />
+
+
+    <TextView
+        android:id="@+id/tv_record_setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
         android:padding="5dp"
         android:text="录像参数设置"
-        android:textColor="@color/black"
-        android:textSize="20sp" />
+        android:textSize="13dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_server_port" />
+
+    <View
+        android:id="@+id/line2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_record_setting"
+        android:layout_marginTop="10dp"
+        android:background="#E4E4E4"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
 
 
     <TextView
+        android:id="@+id/tv_record_way"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="10dp"
         android:padding="5dp"
-        android:text="选择录制方式" />
+        android:text="选择录制方式"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/line2" />
 
     <Spinner
         android:id="@+id/spinner_record_way"
@@ -116,47 +181,65 @@
         android:gravity="center"
         android:overlapAnchor="false"
         android:paddingEnd="10dp"
-        android:spinnerMode="dropdown" />
+        android:spinnerMode="dropdown"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_record_way" />
 
     <TextView
+        android:id="@+id/tv_record_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
         android:padding="5dp"
-        android:text="选择录制类型" />
+        android:text="选择录制类型"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinner_record_way" />
 
     <Spinner
         android:id="@+id/spinner_record_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:gravity="center"
         android:entries="@array/spinner_record_type"
+        android:gravity="center"
         android:overlapAnchor="false"
         android:paddingEnd="10dp"
-        android:spinnerMode="dropdown" />
+        android:spinnerMode="dropdown"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_record_type" />
 
     <TextView
+        android:id="@+id/tv_record_object"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
         android:padding="5dp"
-        android:text="选择录制对象" />
+        android:text="选择录制对象"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinner_record_type" />
 
     <Spinner
         android:id="@+id/spinner_record_object"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:gravity="center"
         android:entries="@array/spinner_record_object"
+        android:gravity="center"
         android:overlapAnchor="false"
         android:paddingEnd="10dp"
-        android:spinnerMode="dropdown" />
+        android:spinnerMode="dropdown"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_record_object" />
 
     <TextView
+        android:id="@+id/tv_record_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
         android:padding="5dp"
-        android:text="选择画面模式" />
+        android:text="选择画面模式"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinner_record_object" />
 
     <Spinner
         android:id="@+id/spinner_record_mode"
@@ -167,30 +250,29 @@
         android:gravity="center"
         android:overlapAnchor="false"
         android:paddingEnd="10dp"
-        android:spinnerMode="dropdown" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="主窗体录像用户" />
-
-    <Spinner
-        android:id="@+id/spinner_record_user"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:overlapAnchor="false"
-        android:paddingEnd="10dp"
-        android:spinnerMode="dropdown" />
+        android:spinnerMode="dropdown"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_record_mode" />
 
     <Button
-        android:id="@+id/btn_save_setting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/btn_upload_log"
+        android:layout_width="250dp"
+        android:layout_height="0dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/bg_btn_rect_white"
-        android:text="@string/save_setting" />
-</LinearLayout>
+        android:background="@drawable/bg_btn_rect_blue"
+        android:text="@string/upload_log"
+        android:textColor="@color/white"
+        app:layout_constraintDimensionRatio="h,1:0.16"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinner_record_mode" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.3" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -79,11 +79,11 @@ public class MoreFeatureFragment extends BaseDlgFragment implements View.OnClick
         String[] selectStrs = new String[users.length + 1];
 
         //添加自己的用户名 ID
-        selectStrs[0] = "ID：" + mUserSelfId + " 用户名：" + anyChatSDK.GetUserName(mUserSelfId) + " (自己)";
+        selectStrs[0] = "用户名：" + anyChatSDK.GetUserName(mUserSelfId) + " (自己)";
 
         //添加其他用户的用户名 ID
         for (int i = 0; i < users.length; i++) {
-            selectStrs[i + 1] = "ID：" + users[i] + " 用户名：" + anyChatSDK.GetUserName(users[i]);
+            selectStrs[i + 1] = "用户名：" + anyChatSDK.GetUserName(users[i]);
         }
 
         //创建单选选择框
@@ -135,7 +135,6 @@ public class MoreFeatureFragment extends BaseDlgFragment implements View.OnClick
             }
             Uri uri = data.getData();
             String path = uri.getPath();
-            ToastUtil.show(path);
             showChooseFile(path);
 
         }
@@ -164,14 +163,11 @@ public class MoreFeatureFragment extends BaseDlgFragment implements View.OnClick
         final int[] users = anyChatSDK.GetOnlineUser();
 
         //显示的字符数组
-        String[] selectStrs = new String[users.length + 1];
-
-        //添加自己的用户名 ID
-        selectStrs[0] = "ID：" + mUserSelfId + " 用户名：" + anyChatSDK.GetUserName(mUserSelfId) + " (自己)";
+        String[] selectStrs = new String[users.length];
 
         //添加其他用户的用户名 ID
         for (int i = 0; i < users.length; i++) {
-            selectStrs[i + 1] = "ID：" + users[i] + " 用户名：" + anyChatSDK.GetUserName(users[i]);
+            selectStrs[i] = " 用户名：" + anyChatSDK.GetUserName(users[i]);
         }
 
         //创建单选选择框
@@ -182,13 +178,12 @@ public class MoreFeatureFragment extends BaseDlgFragment implements View.OnClick
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 AnyChatOutParam param = new AnyChatOutParam();
-                anyChatSDK.TransFile(users[which - 1], path, 0, 0, 0, param);
+                anyChatSDK.TransFile(users[which], path, 0, 0, 0, param);
                 int result = param.GetIntValue();
                 Log.i(tag, "发送路径" + path);
                 Log.i(tag, "发送结果" + result);
             }
         });
-
         alertBuilder.show();
     }
 

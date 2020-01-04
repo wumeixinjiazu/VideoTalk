@@ -56,7 +56,7 @@ public class HdSettingFragment extends BaseDlgFragment implements View.OnClickLi
     private final int[] mArrVideofpsValue = {10, 15, 20, 25};
 
     private String[] resolutionList = new String[]{"320 x 240", "352 x 288", "640 x 480", "720 x 480", "1280 x 720", "1920 x 1280"};
-    private String[] frameList = new String[]{"5 f/s", "10 f/s", "15 f/s", "20 f/s", "25 f/s", "30 f"};
+    private String[] frameList = new String[]{"5 f/s", "10 f/s", "15 f/s", "20 f/s", "25 f/s", "30 f/s"};
     private String[] rateList = new String[]{"100 kb/s", "150 kb/s", "200 kb/s", "300 kb/s", "500 kb/s", "800 kb/s", "1 Mb/s", "1.2 Mb/s", "1.5 Mb/s", "2 Mb/s"};
 
     private ListView lvHdList;
@@ -150,6 +150,8 @@ public class HdSettingFragment extends BaseDlgFragment implements View.OnClickLi
                             1);
 
                     ToastUtil.show("像素调节成功" + position);
+
+                    dismiss();
                 }
             }
         });
@@ -174,6 +176,10 @@ public class HdSettingFragment extends BaseDlgFragment implements View.OnClickLi
         sbResolution.setProgress(mResolution);
         sbFrame.setProgress(mFrame);
         sbRate.setProgress(mRate);
+
+        tvResolution.setText(resolutionList[mResolution]);
+        tvFrame.setText(frameList[mFrame]);
+        tvRate.setText(rateList[mRate]);
 
         //设置进度条最大值
         sbResolution.setMax(resolutionList.length - 1);

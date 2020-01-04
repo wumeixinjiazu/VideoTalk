@@ -56,11 +56,6 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
     private LinearLayout llSmartVideo;
 
     /**
-     * 没有人时展示的Dialog
-     */
-    private ProgressDialog mDialog;
-
-    /**
      * 录制功能按钮
      */
     private ImageButton ibRecord;
@@ -119,10 +114,10 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
             if (refActivity.get() != null) {
                 VideoActivity activity = (VideoActivity) refActivity.get();
                 if (activity.isRecordingState) {
-                    activity.ivRecordState.setBackgroundResource(R.drawable.ic_recording_stop);//切换图片
+                    activity.ivRecordState.setBackgroundResource(R.drawable.transparent);//切换图片
                     activity.isRecordingState = false;
                 } else {
-                    activity.ivRecordState.setBackgroundResource(R.drawable.ic_recording_start);//切换图片
+                    activity.ivRecordState.setBackgroundResource(R.drawable.ic_recording);//切换图片
                     activity.isRecordingState = true;
                 }
 
@@ -135,10 +130,16 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
+
+        //初始化SDK
         initSDK();
+        //初始化监听事件
         initEvent();
+        //初始化控件
         initView();
+        //初始化 音视频交互
         initAudioVideo();
+        //初始化 其他用户视频
         initCallView();
     }
 
@@ -164,10 +165,6 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
                 userList.put(Math.abs(mOnlineUser[i]), Math.abs(mOnlineUser[i]));//把用户的id存进数组(put进去的数值一定要正值 负值的话值都是往 0 索引添加)
                 createOtherVideoView(mOnlineUser[i]);
             }
-        } else {
-            mDialog = new ProgressDialog(this);
-            mDialog.setMessage("等待其他用户加入");
-            mDialog.show();
         }
     }
 
@@ -533,8 +530,6 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
      * 开启录制
      */
     private void startRecord() {
-        chronometer.setVisibility(View.GONE);//录制计时器显示
-        ivRecordState.setVisibility(View.GONE);//正在录制图标显示
         int flag = AnyChatDefine.ANYCHAT_RECORD_FLAGS_VIDEO + AnyChatDefine.ANYCHAT_RECORD_FLAGS_AUDIO + AnyChatDefine.ANYCHAT_RECORD_FLAGS_ABREAST + AnyChatDefine.ANYCHAT_RECORD_FLAGS_STEREO;
         //开始录制 1 为开始 0 为停止
         int state = mAnyChatSDK.StreamRecordCtrlEx(-1, 1, flag, 12306, "");
@@ -641,9 +636,6 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
         Log.i(tag, "用户进入/退出房间消息，dwUserId表示用户ID号，bEnter表示该用户是进入（TRUE）或离开（FALSE）房间:" + dwUserId + "-bEnter:" + bEnter);
         if (bEnter) {
             //进入房间
-            if (mDialog != null && mDialog.isShowing()) {
-                mDialog.dismiss();
-            }
 
             Log.i(tag, "进来一个用户 ID为" + dwUserId);
             Log.i(tag, "进来一个用户 用户名为" + mAnyChatSDK.GetUserName(dwUserId));
@@ -694,10 +686,9 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
         Log.i(tag, "录像时长，单位：秒" + dwElapse);
         Log.i(tag, "录像标志" + dwFlags);
         Log.i(tag, "用户自定义参数，整型" + dwParam);
-
         Log.i(tag, "用户自定义参数，字符串类型" + lpUserStr);
 
-        ToastUtil.show("录制结束，文件保存在" + lpFileName);
+        ToastUtil.show("录制结束，文件保存路径为" + lpFileName);
     }
 
     /**
@@ -717,6 +708,8 @@ public class VideoActivity extends EventActivity implements View.OnClickListener
         Log.i(tag, "拍照标志" + dwFlags);
         Log.i(tag, "用户自定义参数，整型" + dwParam);
         Log.i(tag, "用户自定义参数，字符串类型" + lpUserStr);
+
+        ToastUtil.show("拍照成功，文件保存路径为" + lpFileName);
 
     }
 
