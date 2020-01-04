@@ -7,7 +7,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -132,12 +135,30 @@ public class LoginActivity extends EventActivity implements View.OnClickListener
         ibSetting.setOnClickListener(this);
         btnJoinIn.setOnClickListener(this);
 
+
         //初始化用户名 房间号
         etUser.setText(mUsername);
         etRoom.setText(mRoom);
 
         //设置版本号
         tvAppVersion.setText("V"+AppUtil.getVersionName(this));
+
+        initEditTextHint();
+    }
+
+    /**
+     * 初始化EditText的提示文字大小
+     */
+    private void initEditTextHint() {
+        SpannableString userStr = new SpannableString("请输入用户名");
+        AbsoluteSizeSpan userSize = new AbsoluteSizeSpan(13,true);
+        userStr.setSpan(userSize,0,userStr.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        etUser.setHint(userStr);
+
+        SpannableString roomStr = new SpannableString("请输入会议号");
+        AbsoluteSizeSpan roomSize = new AbsoluteSizeSpan(13,true);
+        roomStr.setSpan(roomSize,0,roomStr.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        etRoom.setHint(roomStr);
     }
 
     @Override
@@ -287,6 +308,11 @@ public class LoginActivity extends EventActivity implements View.OnClickListener
             default:
                 break;
         }
+    }
+
+    @Override
+    public void OnAnyChatConnectMessage(boolean bSuccess) {
+        super.OnAnyChatConnectMessage(bSuccess);
     }
 
     @Override

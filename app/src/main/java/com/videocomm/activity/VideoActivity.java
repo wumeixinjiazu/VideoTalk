@@ -38,7 +38,7 @@ import java.lang.ref.WeakReference;
  * @function[功能简介 视频通讯的Acitivity]
  **/
 
-public class VideoActivity extends EventActivity implements View.OnClickListener, AnyChatBaseEvent, AnyChatRecordEvent, AnyChatTransDataEvent {
+public class VideoActivity extends EventActivity implements View.OnClickListener, AnyChatRecordEvent, AnyChatTransDataEvent {
 
     /**
      * 类名

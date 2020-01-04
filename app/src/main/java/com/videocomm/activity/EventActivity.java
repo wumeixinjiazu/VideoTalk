@@ -22,7 +22,7 @@ import com.videocomm.utils.ToastUtil;
  **/
 public class EventActivity extends BaseActivity implements AnyChatBaseEvent {
 
-    protected AnyChatCoreSDK mAnyChatSDK;
+    protected static AnyChatCoreSDK mAnyChatSDK;
 
     /**
      * 自己的用户ID 不加static 其他类加载进来 会把值重新变为0
@@ -43,7 +43,7 @@ public class EventActivity extends BaseActivity implements AnyChatBaseEvent {
         if (mAnyChatSDK == null) {
             mAnyChatSDK = AnyChatCoreSDK.getInstance(this);
         }
-        mAnyChatSDK.SetBaseEvent(this);
+        mAnyChatSDK.SetBaseEvent(this);//每个子类进来都必须设置，不然子类会接收不到回调。因为子类没有设置回调，自然就接收不到信息
     }
 
     public AnyChatCoreSDK getAnyChatSDK() {
@@ -60,8 +60,8 @@ public class EventActivity extends BaseActivity implements AnyChatBaseEvent {
     @Override
     public void OnAnyChatConnectMessage(boolean bSuccess) {
         if (!bSuccess) {
-            Log.i(this.getClass().getSimpleName(), "连接服务器失败，自动重连，请稍后...");
-            ToastUtil.show("连接服务器失败，自动重连，请稍后..");
+            Log.i(this.getClass().getSimpleName(), "连接服务器失败，自动重连，请稍后..." + bSuccess);
+            ToastUtil.show("连接服务器失败，请检查服务器地址和端口号等");
         }
     }
 
@@ -88,10 +88,10 @@ public class EventActivity extends BaseActivity implements AnyChatBaseEvent {
     public void OnAnyChatLoginMessage(int dwUserId, int dwErrorCode) {
         if (dwErrorCode == 0) {
             mUserSelfId = dwUserId;
-        }else {
-            ToastUtil.show("登陆失败");
+        } else {
+            Log.i(this.getClass().getSimpleName(), "OnAnyChatLoginMessage" + dwErrorCode);
+            ToastUtil.show("登陆失败" + dwErrorCode);
         }
-
     }
 
     /**
