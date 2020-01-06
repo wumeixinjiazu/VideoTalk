@@ -9,8 +9,10 @@
     <color name="gray_9">#999999</color>
     <color name="cam_blue">#04ECE4</color>
     <color name="transparent">#00000000</color>
-    <!--透明度为0.6-->
+    <!--透明度为0.6的白色-->
     <color name="transparent_6">#99FFFFFF</color>
-    <!--透明度为0.2-->
+    <!--透明度为0.2白色-->
     <color name="transparent_2">#33CCCCCC</color>
+
+
 </resources>

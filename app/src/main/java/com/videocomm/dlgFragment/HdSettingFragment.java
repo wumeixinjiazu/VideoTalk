@@ -1,26 +1,16 @@
 package com.videocomm.dlgFragment;
 
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 
 import com.bairuitech.anychat.AnyChatCoreSDK;
 import com.bairuitech.anychat.AnyChatDefine;
@@ -61,7 +51,7 @@ public class HdSettingFragment extends BaseDlgFragment implements View.OnClickLi
 
     private ListView lvHdList;
     private View line;
-    private TextView tvDlgClose;
+    private ImageView ivDlgClose;
     private TextView tvTitleLeft;
     private LinearLayout llCustom;
 
@@ -90,14 +80,14 @@ public class HdSettingFragment extends BaseDlgFragment implements View.OnClickLi
     @Override
     protected void initView(View view) {
         tvTitleLeft = view.findViewById(R.id.tv_title_left);
-        tvDlgClose = view.findViewById(R.id.tv_dlg_close);
+        ivDlgClose = view.findViewById(R.id.iv_dlg_close);
         line = view.findViewById(R.id.line);
         lvHdList = view.findViewById(R.id.lv_hd_list);
         llCustom = view.findViewById(R.id.ll_custom);//自定义画质布局
 
         tvTitleLeft.setClickable(false);
         tvTitleLeft.setOnClickListener(this);
-        tvDlgClose.setOnClickListener(this);
+        ivDlgClose.setOnClickListener(this);
 
         final HdSettingAdapter adapter = new HdSettingAdapter(getContext(), hdSettingList, hdSettingItem);
         lvHdList.setAdapter(adapter);
@@ -121,7 +111,7 @@ public class HdSettingFragment extends BaseDlgFragment implements View.OnClickLi
                     lvHdList.setVisibility(View.GONE);
                     line.setVisibility(View.GONE);
                     tvTitleLeft.setText(getString(R.string.hd_setting_custom));
-                    tvTitleLeft.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_back, 0, 0, 0);
+                    tvTitleLeft.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_black_back, 0, 0, 0);
                     tvTitleLeft.setClickable(true);
                     llCustom.setVisibility(View.VISIBLE);
                 } else {
@@ -149,9 +139,10 @@ public class HdSettingFragment extends BaseDlgFragment implements View.OnClickLi
                             AnyChatDefine.BRAC_SO_LOCALVIDEO_APPLYPARAM,
                             1);
 
-                    ToastUtil.show("像素调节成功" + position);
 
                     dismiss();
+
+                    ToastUtil.show("设置为 " + hdSettingList[position]);
                 }
             }
         });
@@ -254,7 +245,7 @@ public class HdSettingFragment extends BaseDlgFragment implements View.OnClickLi
                 tvTitleLeft.setClickable(false);
                 llCustom.setVisibility(View.GONE);
                 break;
-            case R.id.tv_dlg_close:
+            case R.id.iv_dlg_close:
                 dismiss();//关闭
                 break;
             default:

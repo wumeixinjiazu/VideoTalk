@@ -22,15 +22,14 @@
             android:textColor="@color/black"
             android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/tv_dlg_close"
+        <ImageView
+            android:id="@+id/iv_dlg_close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_marginTop="15dp"
             android:layout_marginEnd="10dp"
-            android:layout_alignBaseline="@id/tv_title_left"
-            android:padding="5dp"
-            android:text="@string/cancel"
+            android:background="@drawable/ic_black_down"
             android:textColor="#3478f7" />
     </RelativeLayout>
 
@@ -46,7 +45,8 @@
         android:id="@+id/lv_hd_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="@null"/>
+        android:divider="@null"
+        android:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/ll_custom"
@@ -70,11 +70,7 @@
 
             <SeekBar
                 android:id="@+id/sb_resolution"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:layout_weight="3" />
+                style="@style/seekBarCustonStyle" />
 
             <TextView
                 android:id="@+id/tv_resolution"
@@ -98,11 +94,7 @@
 
             <SeekBar
                 android:id="@+id/sb_frame"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:layout_weight="3" />
+                style="@style/seekBarCustonStyle" />
 
             <TextView
                 android:id="@+id/tv_frame"
@@ -125,11 +117,7 @@
 
             <SeekBar
                 android:id="@+id/sb_rate"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="20dp"
-                android:layout_weight="3" />
+                style="@style/seekBarCustonStyle" />
 
             <TextView
                 android:id="@+id/tv_rate"
